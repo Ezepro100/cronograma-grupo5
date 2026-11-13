@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cronograma de Limpieza - Grupo 5</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome para iconos modernos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fa-solid fa-broom"></i> Cronograma de Limpieza</h1>
+            <p class="subtitle">Grupo 5 • Organización y Turnos</p>
+        </header>
+
+        <div class="actions">
+            <button id="add-btn" class="btn-primary"><i class="fa-solid fa-plus"></i> Nueva Semana</button>
+            <button id="reset-btn" class="btn-secondary"><i class="fa-solid fa-rotate-right"></i> Restaurar</button>
+        </div>
+
+        <div class="schedule-grid" id="schedule-container">
+            <!-- Las tarjetas se generan dinámicamente con JavaScript -->
+        </div>
+    </div>
+
+    <!-- Modal para Agregar / Editar Turnos -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal" class="close">&times;</span>
+            <h2 id="modal-title">Editar Turno</h2>
+            <form id="schedule-form">
+                <input type="hidden" id="item-id">
+                <div class="form-group">
+                    <label for="week-input">Semana / Período:</label>
+                    <input type="text" id="week-input" required placeholder="Ej. Semana 1">
+                </div>
+                <div class="form-group">
+                    <label for="date-input">Fechas:</label>
+                    <input type="text" id="date-input" required placeholder="Ej. 16 Nov - 22 Nov">
+                </div>
+                <div class="form-group">
+                    <label for="captain-input">Capitán del Grupo:</label>
+                    <input type="text" id="captain-input" required placeholder="Nombre del Capitán">
+                </div>
+                <div class="form-group">
+                    <label for="tasks-input">Tareas (separadas por coma):</label>
+                    <input type="text" id="tasks-input" required placeholder="Barrer, Sacar basura, Limpiar mesas">
+                </div>
+                <button type="submit" class="btn-primary btn-block">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
