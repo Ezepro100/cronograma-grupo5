@@ -4,30 +4,29 @@ const defaultSchedule = [
         week: "Semana 1",
         dates: "19 Noviembre",
         captain: "Daniel Casique",
-        tasks: ["Baños, Auditorio principal, Plataforma, Pasillo y entrada principal, Sala B y lactantes, Patio trasero y pasillo, Proveedor de artículos"]
+        tasks: ["Baños 2 Voluntarios, Auditorio principal 2 Voluntarios, Plataforma 1 Voluntario, Pasillo y entrada principal 1 Voluntario, Sala B y lactantes 1 Voluntario, Patio trasero y pasillo 1 Voluntario, Proveedor de artículos 1 Voluntario"]
     },
     {
         id: 2,
         week: "Semana 2",
         dates: "10 Diciembre",
         captain: "Alberto Bardalez",
-        tasks: ["Baños, Auditorio principal, Plataforma, Pasillo y entrada principal, Sala B y lactantes, Patio trasero y pasillo, Proveedor de artículos"]
+        tasks: ["Baños 2 Voluntarios, Auditorio principal 2 Voluntarios, Plataforma 1 Voluntario, Pasillo y entrada principal 1 Voluntario, Sala B y lactantes 1 Voluntario, Patio trasero y pasillo 1 Voluntario, Proveedor de artículos 1 Voluntario"]
     },
     {
         id: 3,
         week: "Semana 2",
         dates: "31 Diciembre",
         captain: "Marco Yovera",
-        tasks: ["Baños, Auditorio principal, Plataforma, Pasillo y entrada principal, Sala B y lactantes, Patio trasero y pasillo, Proveedor de artículos"]
-    }
-    ,
+        tasks: ["Baños 2 Voluntarios, Auditorio principal 2 Voluntarios, Plataforma 1 Voluntario, Pasillo y entrada principal 1 Voluntario, Sala B y lactantes 1 Voluntario, Patio trasero y pasillo 1 Voluntario, Proveedor de artículos 1 Voluntario"]
+    },
     {
         id: 4,
         week: "Semana 2",
         dates: "21 Enero",
         captain: "Rodolfo Medrano",
-        tasks: ["Baños, Auditorio principal, Plataforma, Pasillo y entrada principal, Sala B y lactantes, Patio trasero y pasillo, Proveedor de artículos"]
-    }
+        tasks: ["Baños 2 Voluntarios, Auditorio principal 2 Voluntarios, Plataforma 1 Voluntario, Pasillo y entrada principal 1 Voluntario, Sala B y lactantes 1 Voluntario, Patio trasero y pasillo 1 Voluntario, Proveedor de artículos 1 Voluntario"]
+    },
     // Puedes agregar más semanas aquí si lo necesitas
 ];
 
