@@ -1,12 +1,12 @@
 :root {
-    --bg-main: #0f172a;        /* Azul oscuro profundo */
-    --bg-card: #1e293b;        /* Gris azulado de tarjetas */
-    --bg-card-hover: #334155;  /* Gris claro para hover */
-    --text-main: #f8fafc;      /* Blanco suave */
-    --text-muted: #94a3b8;     /* Gris secundario */
-    --accent-mint: #2dd4bf;    /* Verde menta brillante */
+    --bg-main: #0f172a;
+    --bg-card: #1e293b;
+    --bg-card-hover: #334155;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent-mint: #2dd4bf;
     --accent-mint-hover: #14b8a6;
-    --accent-blue: #38bdf8;    /* Azul claro */
+    --accent-blue: #38bdf8;
     --border-color: #334155;
     --danger: #f43f5e;
 }
@@ -19,11 +19,10 @@
 }
 
 body {
-    /* Capa oscura muy suave (0.30 - 0.40) para que la imagen de fondo se vea con todo su color y brillo */
-    background: linear-gradient(rgba(15, 23, 42, 0.30), rgba(15, 23, 42, 0.40)), 
+    background: linear-gradient(rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.50)), 
                 url('1848.jpg');
     background-size: cover;
-    background-position: center;
+    background-position: center center;
     background-repeat: no-repeat;
     background-attachment: fixed;
     color: var(--text-main);
@@ -108,13 +107,12 @@ button {
 
 .schedule-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     gap: 1.5rem;
 }
 
 .schedule-card {
-    /* Tarjetas con fondo más sólido (0.96) y mayor blur para que resalten sobre la foto brillante */
-    background-color: rgba(15, 23, 42, 0.96);
+    background-color: rgba(15, 23, 42, 0.94);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border: 1px solid rgba(45, 212, 191, 0.3);
@@ -197,27 +195,52 @@ button {
     gap: 6px;
 }
 
+/* Lista de tareas separadas y con iconos circulares */
 .tasks-list {
     list-style: none;
     border-top: 1px solid var(--border-color);
-    padding-top: 0.8rem;
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .tasks-list li {
-    font-size: 0.85rem;
+    list-style: none !important;
+    position: relative;
+    padding: 10px 12px 10px 44px;
+    background: rgba(30, 41, 59, 0.65);
+    border: 1px solid rgba(45, 212, 191, 0.18);
+    border-radius: 10px;
+    font-size: 0.88rem;
     color: #e2e8f0;
-    padding: 4px 0;
+    line-height: 1.35;
+    min-height: 44px;
     display: flex;
     align-items: center;
-    gap: 8px;
 }
 
 .tasks-list li::before {
-    content: "•";
-    color: var(--accent-mint);
-    font-weight: bold;
-    font-size: 1.1rem;
+    content: "";
+    position: absolute;
+    left: 10px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-image: url('ico.jpg');
+    background-size: 700% 100%;
+    border: 1px solid rgba(45, 212, 191, 0.45);
+    box-shadow: 0 0 8px rgba(45, 212, 191, 0.25);
 }
+
+/* Asignación de iconos por orden de lista */
+.tasks-list li:nth-child(1)::before { background-position: 0% 0%; }
+.tasks-list li:nth-child(2)::before { background-position: 16.6% 0%; }
+.tasks-list li:nth-child(3)::before { background-position: 33.3% 0%; }
+.tasks-list li:nth-child(4)::before { background-position: 50% 0%; }
+.tasks-list li:nth-child(5)::before { background-position: 66.6% 0%; }
+.tasks-list li:nth-child(6)::before { background-position: 83.3% 0%; }
+.tasks-list li:nth-child(7)::before { background-position: 100% 0%; }
 
 /* Modal de Edición */
 .modal {
@@ -302,73 +325,29 @@ button {
     display: none !important;
 }
 
-body {
-    background-image: linear-gradient(rgba(7, 19, 38, 0.72), rgba(7, 19, 38, 0.85)), url('1848.jpg'); /* Asegúrate de usar el nombre exacto de tu imagen de fondo */
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    min-height: 100vh;
-}
-
-/* Ajuste específico para celulares (evita saltos o zooms bruscos en móviles) */
+/* Adaptación para celulares */
 @media (max-width: 768px) {
     body {
         background-attachment: scroll;
         background-position: center top;
+        padding: 1.5rem 0.8rem;
     }
-}
 
-.tasks-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px; /* Separa cada tarea de la siguiente */
-    padding: 0;
-    margin-top: 15px;
-}
+    header h1 {
+        font-size: 1.8rem;
+    }
 
-.tasks-list li {
-    list-style: none !important;
-    position: relative;
-    padding: 10px 12px 10px 44px; /* Espacio interno y margen izquierdo para el icono */
-    background: rgba(15, 23, 42, 0.55); /* Fondo sutil para separar visualmente cada fila */
-    border: 1px solid rgba(45, 212, 191, 0.15);
-    border-radius: 10px;
-    font-size: 0.92rem;
-    color: #e2e8f0;
-    line-height: 1.4;
-    min-height: 42px;
-    display: flex;
-    align-items: center;
-}
-
-/* Ajuste de posición del icono circular dentro de la nueva fila espaciada */
-.tasks-list li::before {
-    content: "";
-    position: absolute;
-    left: 10px;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background-image: url('ico.jpg');
-    background-size: 700% 100%;
-    border: 1px solid rgba(45, 212, 191, 0.4);
-    box-shadow: 0 0 8px rgba(45, 212, 191, 0.2);
-}
-
-/* Espaciado extra en pantallas de celular */
-@media (max-width: 600px) {
     .schedule-grid {
-        gap: 20px;
-        padding: 10px;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
     }
-    
+
     .tasks-list {
-        gap: 14px; /* Un poco más de separación táctil en móviles */
+        gap: 12px;
     }
-    
+
     .tasks-list li {
-        font-size: 0.95rem;
+        font-size: 0.92rem;
         padding: 12px 12px 12px 46px;
     }
 }

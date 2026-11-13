@@ -4,34 +4,65 @@ const defaultSchedule = [
         week: "Semana 1",
         dates: "19 Noviembre",
         captain: "Daniel Casique",
-        tasks: ["Baños 2 Voluntarios, Auditorio principal 2 Voluntarios, Plataforma 1 Voluntario, Pasillo y entrada principal 1 Voluntario, Sala B y lactantes 1 Voluntario, Patio trasero y pasillo 1 Voluntario, Proveedor de artículos 1 Voluntario"]
+        tasks: [
+            "Baños (2 Voluntarios)",
+            "Auditorio principal (2 Voluntarios)",
+            "Plataforma (1 Voluntario)",
+            "Pasillo y entrada principal (1 Voluntario)",
+            "Sala B y lactantes (1 Voluntario)",
+            "Patio trasero y pasillo (1 Voluntario)",
+            "Proveedor de artículos (1 Voluntario)"
+        ]
     },
     {
         id: 2,
         week: "Semana 2",
         dates: "10 Diciembre",
         captain: "Alberto Bardalez",
-        tasks: ["Baños 2 Voluntarios, Auditorio principal 2 Voluntarios, Plataforma 1 Voluntario, Pasillo y entrada principal 1 Voluntario, Sala B y lactantes 1 Voluntario, Patio trasero y pasillo 1 Voluntario, Proveedor de artículos 1 Voluntario"]
+        tasks: [
+            "Baños (2 Voluntarios)",
+            "Auditorio principal (2 Voluntarios)",
+            "Plataforma (1 Voluntario)",
+            "Pasillo y entrada principal (1 Voluntario)",
+            "Sala B y lactantes (1 Voluntario)",
+            "Patio trasero y pasillo (1 Voluntario)",
+            "Proveedor de artículos (1 Voluntario)"
+        ]
     },
     {
         id: 3,
-        week: "Semana 2",
+        week: "Semana 3",
         dates: "31 Diciembre",
         captain: "Marco Yovera",
-        tasks: ["Baños 2 Voluntarios, Auditorio principal 2 Voluntarios, Plataforma 1 Voluntario, Pasillo y entrada principal 1 Voluntario, Sala B y lactantes 1 Voluntario, Patio trasero y pasillo 1 Voluntario, Proveedor de artículos 1 Voluntario"]
+        tasks: [
+            "Baños (2 Voluntarios)",
+            "Auditorio principal (2 Voluntarios)",
+            "Plataforma (1 Voluntario)",
+            "Pasillo y entrada principal (1 Voluntario)",
+            "Sala B y lactantes (1 Voluntario)",
+            "Patio trasero y pasillo (1 Voluntario)",
+            "Proveedor de artículos (1 Voluntario)"
+        ]
     },
     {
         id: 4,
-        week: "Semana 2",
+        week: "Semana 4",
         dates: "21 Enero",
         captain: "Rodolfo Medrano",
-        tasks: ["Baños 2 Voluntarios, Auditorio principal 2 Voluntarios, Plataforma 1 Voluntario, Pasillo y entrada principal 1 Voluntario, Sala B y lactantes 1 Voluntario, Patio trasero y pasillo 1 Voluntario, Proveedor de artículos 1 Voluntario"]
-    },
-    // Puedes agregar más semanas aquí si lo necesitas
+        tasks: [
+            "Baños (2 Voluntarios)",
+            "Auditorio principal (2 Voluntarios)",
+            "Plataforma (1 Voluntario)",
+            "Pasillo y entrada principal (1 Voluntario)",
+            "Sala B y lactantes (1 Voluntario)",
+            "Patio trasero y pasillo (1 Voluntario)",
+            "Proveedor de artículos (1 Voluntario)"
+        ]
+    }
 ];
 
-// Cargar desde localStorage o usar valores por defecto
-let scheduleData = JSON.parse(localStorage.getItem('grupo5_schedule')) || defaultSchedule;
+// Cargar desde localStorage con nueva clave para evitar caché vieja
+let scheduleData = JSON.parse(localStorage.getItem('grupo5_schedule_v2')) || defaultSchedule;
 
 // Elementos del DOM
 const scheduleContainer = document.getElementById('schedule-container');
@@ -82,7 +113,7 @@ function renderSchedule() {
 
 // Guardar en la memoria local del navegador
 function saveToLocalStorage() {
-    localStorage.setItem('grupo5_schedule', JSON.stringify(scheduleData));
+    localStorage.setItem('grupo5_schedule_v2', JSON.stringify(scheduleData));
 }
 
 // Abrir modal para crear nuevo turno
@@ -132,13 +163,11 @@ scheduleForm.addEventListener('submit', (e) => {
     const tasks = tasksInput.value.split(',').map(t => t.trim()).filter(t => t.length > 0);
 
     if (id) {
-        // Actualizar
         const index = scheduleData.findIndex(i => i.id == id);
         if (index !== -1) {
             scheduleData[index] = { id: Number(id), week, dates, captain, tasks };
         }
     } else {
-        // Crear nuevo
         const newId = scheduleData.length > 0 ? Math.max(...scheduleData.map(i => i.id)) + 1 : 1;
         scheduleData.push({ id: newId, week, dates, captain, tasks });
     }
