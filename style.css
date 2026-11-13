@@ -301,3 +301,74 @@ button {
 .card-actions, #add-btn, #reset-btn {
     display: none !important;
 }
+
+body {
+    background-image: linear-gradient(rgba(7, 19, 38, 0.72), rgba(7, 19, 38, 0.85)), url('1848.jpg'); /* Asegúrate de usar el nombre exacto de tu imagen de fondo */
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+/* Ajuste específico para celulares (evita saltos o zooms bruscos en móviles) */
+@media (max-width: 768px) {
+    body {
+        background-attachment: scroll;
+        background-position: center top;
+    }
+}
+
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Separa cada tarea de la siguiente */
+    padding: 0;
+    margin-top: 15px;
+}
+
+.tasks-list li {
+    list-style: none !important;
+    position: relative;
+    padding: 10px 12px 10px 44px; /* Espacio interno y margen izquierdo para el icono */
+    background: rgba(15, 23, 42, 0.55); /* Fondo sutil para separar visualmente cada fila */
+    border: 1px solid rgba(45, 212, 191, 0.15);
+    border-radius: 10px;
+    font-size: 0.92rem;
+    color: #e2e8f0;
+    line-height: 1.4;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+}
+
+/* Ajuste de posición del icono circular dentro de la nueva fila espaciada */
+.tasks-list li::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-image: url('ico.jpg');
+    background-size: 700% 100%;
+    border: 1px solid rgba(45, 212, 191, 0.4);
+    box-shadow: 0 0 8px rgba(45, 212, 191, 0.2);
+}
+
+/* Espaciado extra en pantallas de celular */
+@media (max-width: 600px) {
+    .schedule-grid {
+        gap: 20px;
+        padding: 10px;
+    }
+    
+    .tasks-list {
+        gap: 14px; /* Un poco más de separación táctil en móviles */
+    }
+    
+    .tasks-list li {
+        font-size: 0.95rem;
+        padding: 12px 12px 12px 46px;
+    }
+}
