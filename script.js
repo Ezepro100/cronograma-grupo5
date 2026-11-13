@@ -4,23 +4,17 @@ const defaultSchedule = [
         id: 1,
         week: "Semana 1",
         dates: "16 Nov - 22 Nov",
-        captain: "Alex Silva",
+        captain: "Nombre del Capitán 1",
         tasks: ["Barrer y trapear", "Limpiar escritorios", "Sacar la basura"]
     },
     {
         id: 2,
         week: "Semana 2",
         dates: "23 Nov - 29 Nov",
-        captain: "Valentina Gómez",
+        captain: "Nombre del Capitán 2",
         tasks: ["Limpiar pizarrones", "Ordenar estanterías", "Ventilar el aula"]
-    },
-    {
-        id: 3,
-        week: "Semana 3",
-        dates: "30 Nov - 06 Dic",
-        captain: "Mateo Rossi",
-        tasks: ["Barrer y trapear", "Limpiar ventanas", "Desinfectar manijas"]
     }
+    // Puedes agregar más semanas aquí si lo necesitas
 ];
 
 // Cargar desde localStorage o usar valores por defecto
