@@ -283,3 +283,8 @@ button {
     margin-top: 1rem;
     padding: 0.75rem;
 }
+
+/* Ocultar botones de edición y formularios para visitantes */
+.card-actions, #add-btn, #reset-btn {
+    display: none !important;
+}
