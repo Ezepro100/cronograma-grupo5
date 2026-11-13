@@ -3,16 +3,31 @@ const defaultSchedule = [
     {
         id: 1,
         week: "Semana 1",
-        dates: "16 Nov - 22 Nov",
-        captain: "Nombre del Capitán 1",
-        tasks: ["Barrer y trapear", "Limpiar escritorios", "Sacar la basura"]
+        dates: "19 Noviembre",
+        captain: "Daniel Casique",
+        tasks: ["Baños, Auditorio principal, Plataforma, Pasillo y entrada principal, Sala B y lactantes, Patio trasero y pasillo, Proveedor de artículos"]
     },
     {
         id: 2,
         week: "Semana 2",
-        dates: "23 Nov - 29 Nov",
-        captain: "Nombre del Capitán 2",
-        tasks: ["Limpiar pizarrones", "Ordenar estanterías", "Ventilar el aula"]
+        dates: "10 Diciembre",
+        captain: "Alberto Bardalez",
+        tasks: ["Baños, Auditorio principal, Plataforma, Pasillo y entrada principal, Sala B y lactantes, Patio trasero y pasillo, Proveedor de artículos"]
+    },
+    {
+        id: 3,
+        week: "Semana 2",
+        dates: "31 Diciembre",
+        captain: "Marco Yovera",
+        tasks: ["Baños, Auditorio principal, Plataforma, Pasillo y entrada principal, Sala B y lactantes, Patio trasero y pasillo, Proveedor de artículos"]
+    }
+    ,
+    {
+        id: 4,
+        week: "Semana 2",
+        dates: "21 Enero",
+        captain: "Rodolfo Medrano",
+        tasks: ["Baños, Auditorio principal, Plataforma, Pasillo y entrada principal, Sala B y lactantes, Patio trasero y pasillo, Proveedor de artículos"]
     }
     // Puedes agregar más semanas aquí si lo necesitas
 ];
