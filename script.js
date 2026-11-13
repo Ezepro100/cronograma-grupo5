@@ -1,4 +1,3 @@
-// Datos iniciales de ejemplo para el Grupo 5
 const defaultSchedule = [
     {
         id: 1,
