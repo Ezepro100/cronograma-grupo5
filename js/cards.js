@@ -1,8 +1,8 @@
 // Render de la tarjeta de una semana, compartido por la vista de usuario y la de admin.
-import { esc, fmtFecha, asignados, norm } from './common.js?v=20261117d';
+import { esc, fmtFecha, asignados, norm } from './common.js?v=20261117e';
 
-import { icon } from './icons.js?v=20261117d';
-import { badgeHTML } from './areas.js?v=20261117d';
+import { icon } from './icons.js?v=20261117e';
+import { badgeHTML, generoCupo, GENEROS } from './areas.js?v=20261117e';
 
 /**
  * @param {object} s semana
@@ -23,8 +23,9 @@ export function cardHTML(s, o = {}) {
     const match = q && vols.some(v => v && norm(v).includes(q));
     const abierta = o.admin || match || o.abiertas?.has(`${s.id}:${i}`);
     const chips = vols.map((v, k) => {
-      const cls = v ? `chip${q && norm(v).includes(q) ? ' match' : ''}` : 'chip libre';
-      const txt = v ? esc(v) : 'Cupo libre';
+      const g = generoCupo(t, k);
+      const cls = (v ? `chip${q && norm(v).includes(q) ? ' match' : ''}` : 'chip libre') + (g ? ' con-g' : '');
+      const txt = (g ? `<span class="g ${g}" title="Baño de ${GENEROS[g].label.toLowerCase()}">${icon(g)}</span>` : '') + (v ? esc(v) : 'Cupo libre');
       return o.admin
         ? `<button type="button" class="${cls}" data-act="slot" data-id="${s.id}" data-t="${i}" data-k="${k}" title="${v ? 'Cambiar voluntario' : 'Asignar voluntario'}">${txt}</button>`
         : `<span class="${cls}">${txt}</span>`;

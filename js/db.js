@@ -1,8 +1,8 @@
 // Capa de datos única para ambas vistas.
 // - Con firebase-config.js completo: Firestore (tiempo real + caché offline) y Firebase Auth.
 // - Sin configurar: MODO LOCAL con localStorage, para probar sin backend.
-import { firebaseConfig } from './firebase-config.js?v=20261117d';
-import { SEMANAS, VOLUNTARIOS, PLANTILLA } from './seed.js?v=20261117d';
+import { firebaseConfig } from './firebase-config.js?v=20261117e';
+import { SEMANAS, VOLUNTARIOS, PLANTILLA } from './seed.js?v=20261117e';
 
 const FB_VERSION = '10.12.2';
 const FB = `https://www.gstatic.com/firebasejs/${FB_VERSION}`;

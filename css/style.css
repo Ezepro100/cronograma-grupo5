@@ -266,6 +266,13 @@ button.chip:hover { border-color: var(--mint); }
 button.chip.libre:hover { color: var(--mint); }
 .chips .slot-select { width: auto; max-width: 100%; padding: 4px 10px; font-size: .8rem; border-radius: 20px; border-color: var(--mint); }
 
+/* Cupos con género (Baños) */
+.chip.con-g::before { display: none; }
+.chip .g { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-left: -4px; border-radius: 50%; font-size: .74rem; flex: none; }
+.chip .g .i { stroke-width: 2.6; }
+.chip .g.mars { color: #38bdf8; background: rgba(56, 189, 248, .2); }
+.chip .g.venus { color: #f472b6; background: rgba(244, 114, 182, .2); }
+
 /* Equipos */
 .group { border: 1px solid var(--border); border-radius: 12px; padding: .7rem; display: flex; flex-direction: column; gap: 6px; background: rgba(15, 23, 42, .5); }
 .group-head { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--mint); padding: 0 .2rem .2rem; }

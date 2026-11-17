@@ -1,7 +1,7 @@
 // Compartir una semana: genera una imagen (canvas) con todo lo cargado + texto con enlace directo.
-import { SHAPES, icon } from './icons.js?v=20261117d';
-import { AREAS, areaDe } from './areas.js?v=20261117d';
-import { fmtFecha, toast } from './common.js?v=20261117d';
+import { SHAPES, icon } from './icons.js?v=20261117e';
+import { AREAS, areaDe, generoCupo, GENEROS } from './areas.js?v=20261117e';
+import { fmtFecha, toast } from './common.js?v=20261117e';
 
 const W = 1080;
 const PAD = 56;
@@ -20,7 +20,7 @@ const vols = t => Array.from({ length: Math.max(1, Number(t.cupos) || 1) }, (_, 
 export function textoSemana(s) {
   const lineas = (s.tareas || []).map(t => {
     const v = vols(t);
-    const nombres = v.filter(Boolean);
+    const nombres = v.map((n, k) => n && (generoCupo(t, k) ? `${GENEROS[generoCupo(t, k)].emoji} ${n}` : n)).filter(Boolean);
     const libres = v.length - nombres.length;
     return `• *${t.nombre}*: ${nombres.join(', ') || '—'}${libres ? ` (${libres} cupo${libres > 1 ? 's' : ''} libre${libres > 1 ? 's' : ''})` : ''}`;
   });
@@ -172,7 +172,10 @@ function pintar(ctx, s, dry) {
 
     // Distribuir chips en líneas
     ctx.font = `600 26px ${FONT}`;
-    const chips = v.map(nombre => ({ nombre, w: ctx.measureText(nombre || 'Cupo libre').width + (nombre ? 56 : 44) }));
+    const chips = v.map((nombre, k) => {
+      const g = generoCupo(t, k);
+      return { nombre, g, w: ctx.measureText(nombre || 'Cupo libre').width + (nombre ? 56 : 44) + (g ? 26 : 0) };
+    });
     let cx = chipX0, cy = rowY + 70;
     chips.forEach(c => {
       if (cx + c.w > chipMax && cx > chipX0) { cx = chipX0; cy += 58; }
@@ -214,21 +217,35 @@ function pintar(ctx, s, dry) {
       // Chips
       chips.forEach(c => {
         rrect(ctx, c.x, c.y, c.w, 46, 23);
+        const gc = c.g && GENEROS[c.g].color;
         if (c.nombre) {
           ctx.fillStyle = alpha(C.mint, 0.18); ctx.fill();
           ctx.strokeStyle = alpha(C.mint, 0.5); ctx.lineWidth = 2; ctx.stroke();
-          ctx.fillStyle = C.mint;
-          ctx.beginPath(); ctx.arc(c.x + 22, c.y + 23, 6, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = '#ccfbf1';
-          ctx.font = `600 26px ${FONT}`;
-          ctx.fillText(c.nombre, c.x + 38, c.y + 9);
         } else {
           ctx.setLineDash([7, 6]);
           ctx.strokeStyle = '#475569'; ctx.lineWidth = 2; ctx.stroke();
           ctx.setLineDash([]);
+        }
+        let tx = c.x + 22;
+        if (c.g) {
+          // Símbolo ♂ / ♀ del baño que corresponde a este cupo
+          ctx.fillStyle = alpha(gc, 0.22);
+          ctx.beginPath(); ctx.arc(c.x + 27, c.y + 23, 16, 0, Math.PI * 2); ctx.fill();
+          dibujarIcono(ctx, c.g, c.x + 16, c.y + 12, 22, gc, 2.8);
+          tx = c.x + 52;
+        } else if (c.nombre) {
+          ctx.fillStyle = C.mint;
+          ctx.beginPath(); ctx.arc(c.x + 22, c.y + 23, 6, 0, Math.PI * 2); ctx.fill();
+          tx = c.x + 38;
+        }
+        if (c.nombre) {
+          ctx.fillStyle = '#ccfbf1';
+          ctx.font = `600 26px ${FONT}`;
+          ctx.fillText(c.nombre, tx, c.y + 9);
+        } else {
           ctx.fillStyle = C.muted;
           ctx.font = `500 24px ${FONT}`;
-          ctx.fillText('Cupo libre', c.x + 22, c.y + 11);
+          ctx.fillText('Cupo libre', tx, c.y + 11);
         }
       });
     });

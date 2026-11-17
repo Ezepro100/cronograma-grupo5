@@ -1,7 +1,7 @@
 // Catálogo de áreas: ícono + color para identificar cada tarea de un vistazo.
 // Si una tarea no tiene "icono" elegido, se deduce de su nombre (ej. "Baños mujeres" → baño de mujeres).
-import { icon } from './icons.js?v=20261117d';
-import { norm, esc } from './common.js?v=20261117d';
+import { icon } from './icons.js?v=20261117e';
+import { norm, esc } from './common.js?v=20261117e';
 
 export const AREAS = {
   'bano-varones': { label: 'Baño de varones', icon: 'toilet', sub: 'mars', color: '#38bdf8' },
@@ -46,6 +46,19 @@ export function areaDe(t) {
   const n = norm(t?.nombre);
   for (const [re, k] of REGLAS) if (re.test(n)) return typeof k === 'function' ? k(n) : k;
   return 'general';
+}
+
+export const GENEROS = {
+  mars: { label: 'Varones', color: '#38bdf8', emoji: '🚹' },
+  venus: { label: 'Mujeres', color: '#f472b6', emoji: '🚺' }
+};
+
+/** En la tarea "Baños" (general) con 2+ cupos: la primera mitad es el baño de varones y la segunda el de mujeres. */
+export function generoCupo(t, k) {
+  if (areaDe(t) !== 'bano') return null;
+  const c = Number(t.cupos) || 0;
+  if (c < 2) return null;
+  return k < Math.ceil(c / 2) ? 'mars' : 'venus';
 }
 
 /** Insignia de color con el ícono del área (y el símbolo ♂/♀ en los baños). */

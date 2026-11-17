@@ -1,10 +1,10 @@
 // Vista de administrador: login + CRUD de semanas, voluntarios y tareas base.
-import { icon } from './icons.js?v=20261117d';
-import { MODE, subscribe, save, saveMany, remove, seed, onAuth, login, logout, isAdmin } from './db.js?v=20261117d';
-import { esc, norm, asignados, hoyISO, proximaId, toast, bannerModo } from './common.js?v=20261117d';
-import { cardHTML } from './cards.js?v=20261117d';
-import { badgeHTML, opcionesArea } from './areas.js?v=20261117d';
-import { abrirCompartir } from './share.js?v=20261117d';
+import { icon } from './icons.js?v=20261117e';
+import { MODE, subscribe, save, saveMany, remove, seed, onAuth, login, logout, isAdmin } from './db.js?v=20261117e';
+import { esc, norm, asignados, hoyISO, proximaId, toast, bannerModo } from './common.js?v=20261117e';
+import { cardHTML } from './cards.js?v=20261117e';
+import { badgeHTML, opcionesArea, generoCupo, GENEROS } from './areas.js?v=20261117e';
+import { abrirCompartir } from './share.js?v=20261117e';
 
 bannerModo();
 
@@ -210,10 +210,18 @@ const $dlg = $('dlg-semana');
 const $form = $('semana-form');
 const $tasks = $('task-editors');
 
-function slotsHTML(cupos, vols = []) {
+const placeholderCupo = (t, i) => {
+  const g = generoCupo(t, i);
+  return g ? `${GENEROS[g].emoji} Baño ${GENEROS[g].label.toLowerCase()}` : `Voluntario ${i + 1}`;
+};
+
+function slotsHTML(cupos, vols = [], t = {}) {
+  const tt = { ...t, cupos };
   return Array.from({ length: cupos }, (_, i) =>
-    `<input list="vol-list" placeholder="Voluntario ${i + 1}" value="${esc(vols[i] || '')}" maxlength="60" autocomplete="off" aria-label="Voluntario ${i + 1}">`).join('');
+    `<input list="vol-list" placeholder="${esc(placeholderCupo(tt, i))}" value="${esc(vols[i] || '')}" maxlength="60" autocomplete="off" aria-label="${esc(placeholderCupo(tt, i))}">`).join('');
 }
+
+const datosTarea = el => ({ nombre: el.querySelector('[name=nombre]').value, icono: el.querySelector('[name=icono]').value, cupos: clampCupos(el.querySelector('[name=cupos]').value) });
 
 function taskEditorHTML(t) {
   const cupos = clampCupos(t.cupos);
@@ -230,7 +238,7 @@ function taskEditorHTML(t) {
       <button type="button" class="icon-btn" data-move="1" title="Bajar">${icon('down')}</button>
       <button type="button" class="icon-btn danger" data-del title="Quitar tarea">${icon('trash')}</button>
     </div>
-    <div class="slots">${slotsHTML(cupos, t.voluntarios)}</div>
+    <div class="slots">${slotsHTML(cupos, t.voluntarios, t)}</div>
   </div>`;
 }
 
@@ -297,13 +305,15 @@ $('fill-team').addEventListener('click', () => {
 $tasks.addEventListener('input', e => {
   if (e.target.name === 'nombre' || e.target.name === 'icono') {
     const el = e.target.closest('.task-edit');
-    el.querySelector('.area-badge').outerHTML = badgeHTML({ nombre: el.querySelector('[name=nombre]').value, icono: el.querySelector('[name=icono]').value });
+    const t = datosTarea(el);
+    el.querySelector('.area-badge').outerHTML = badgeHTML(t);
+    el.querySelectorAll('.slots input').forEach((inp, i) => { inp.placeholder = inp.ariaLabel = placeholderCupo(t, i); });
     return;
   }
   if (e.target.name === 'cupos') {
     const el = e.target.closest('.task-edit');
     const actuales = [...el.querySelectorAll('.slots input')].map(i => i.value);
-    el.querySelector('.slots').innerHTML = slotsHTML(clampCupos(e.target.value), actuales);
+    el.querySelector('.slots').innerHTML = slotsHTML(clampCupos(e.target.value), actuales, datosTarea(el));
   }
   revisarDuplicados();
 });
