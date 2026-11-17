@@ -1,10 +1,10 @@
 // Vista de administrador: login + CRUD de semanas, voluntarios y tareas base.
-import { icon } from './icons.js?v=20261117e';
-import { MODE, subscribe, save, saveMany, remove, seed, onAuth, login, logout, isAdmin } from './db.js?v=20261117e';
-import { esc, norm, asignados, hoyISO, proximaId, toast, bannerModo } from './common.js?v=20261117e';
-import { cardHTML } from './cards.js?v=20261117e';
-import { badgeHTML, opcionesArea, generoCupo, GENEROS } from './areas.js?v=20261117e';
-import { abrirCompartir } from './share.js?v=20261117e';
+import { icon } from './icons.js?v=20261117f';
+import { MODE, subscribe, save, saveMany, remove, seed, onAuth, login, logout, isAdmin } from './db.js?v=20261117f';
+import { esc, norm, asignados, hoyISO, proximaId, toast, bannerModo } from './common.js?v=20261117f';
+import { cardHTML } from './cards.js?v=20261117f';
+import { badgeHTML, opcionesArea, generoCupo, GENEROS } from './areas.js?v=20261117f';
+import { abrirCompartir } from './share.js?v=20261117f';
 
 bannerModo();
 

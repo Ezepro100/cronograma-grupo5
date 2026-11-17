@@ -1,8 +1,8 @@
 // Render de la tarjeta de una semana, compartido por la vista de usuario y la de admin.
-import { esc, fmtFecha, asignados, norm } from './common.js?v=20261117e';
+import { esc, fmtFecha, asignados, norm } from './common.js?v=20261117f';
 
-import { icon } from './icons.js?v=20261117e';
-import { badgeHTML, generoCupo, GENEROS } from './areas.js?v=20261117e';
+import { icon } from './icons.js?v=20261117f';
+import { badgeHTML, generoCupo, GENEROS } from './areas.js?v=20261117f';
 
 /**
  * @param {object} s semana
@@ -43,7 +43,6 @@ export function cardHTML(s, o = {}) {
 
   const acciones = o.admin
     ? `<div class="card-actions">
-        <button class="icon-btn share" data-act="compartir" data-id="${s.id}" title="Compartir imagen y enlace">${icon('share')}</button>
         <button class="icon-btn" data-act="editar" data-id="${s.id}" title="Editar">${icon('edit')}</button>
         <button class="icon-btn" data-act="duplicar" data-id="${s.id}" title="Duplicar">${icon('copy')}</button>
         <button class="icon-btn danger" data-act="eliminar" data-id="${s.id}" title="Eliminar">${icon('trash')}</button>
@@ -63,5 +62,6 @@ export function cardHTML(s, o = {}) {
       <small>${llenos}/${total} cupos</small>
     </div>
     <ul class="tasks-list">${items || '<li class="empty">Sin tareas</li>'}</ul>
+    ${o.admin ? `<button type="button" class="btn-primary btn-share" data-act="compartir" data-id="${s.id}">${icon('share')} Compartir imagen y enlace</button>` : ''}
   </article>`;
 }

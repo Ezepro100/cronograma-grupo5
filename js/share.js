@@ -1,7 +1,7 @@
 // Compartir una semana: genera una imagen (canvas) con todo lo cargado + texto con enlace directo.
-import { SHAPES, icon } from './icons.js?v=20261117e';
-import { AREAS, areaDe, generoCupo, GENEROS } from './areas.js?v=20261117e';
-import { fmtFecha, toast } from './common.js?v=20261117e';
+import { SHAPES, icon } from './icons.js?v=20261117f';
+import { AREAS, areaDe, generoCupo, GENEROS } from './areas.js?v=20261117f';
+import { fmtFecha, toast } from './common.js?v=20261117f';
 
 const W = 1080;
 const PAD = 56;

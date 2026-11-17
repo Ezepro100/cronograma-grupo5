@@ -1,7 +1,7 @@
 // Catálogo de áreas: ícono + color para identificar cada tarea de un vistazo.
 // Si una tarea no tiene "icono" elegido, se deduce de su nombre (ej. "Baños mujeres" → baño de mujeres).
-import { icon } from './icons.js?v=20261117e';
-import { norm, esc } from './common.js?v=20261117e';
+import { icon } from './icons.js?v=20261117f';
+import { norm, esc } from './common.js?v=20261117f';
 
 export const AREAS = {
   'bano-varones': { label: 'Baño de varones', icon: 'toilet', sub: 'mars', color: '#38bdf8' },

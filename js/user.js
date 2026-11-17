@@ -1,8 +1,8 @@
 // Vista pública: solo lectura, una tarjeta a la vez (Anterior · Actual · Próxima).
-import './icons.js?v=20261117e';
-import { subscribe } from './db.js?v=20261117e';
-import { hoyISO, bannerModo } from './common.js?v=20261117e';
-import { cardHTML } from './cards.js?v=20261117e';
+import './icons.js?v=20261117f';
+import { subscribe } from './db.js?v=20261117f';
+import { hoyISO, bannerModo } from './common.js?v=20261117f';
+import { cardHTML } from './cards.js?v=20261117f';
 
 bannerModo();
 

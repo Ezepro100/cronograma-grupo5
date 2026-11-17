@@ -1,5 +1,5 @@
-import { MODE } from './db.js?v=20261117e';
-import { icon } from './icons.js?v=20261117e';
+import { MODE } from './db.js?v=20261117f';
+import { icon } from './icons.js?v=20261117f';
 
 const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 /** Escapa texto ingresado por usuarios antes de insertarlo como HTML. */
