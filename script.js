@@ -71,7 +71,6 @@ const resetBtn = document.getElementById('reset-btn');
 const closeModal = document.getElementById('close-modal');
 const scheduleForm = document.getElementById('schedule-form');
 
-// Rellenar las opciones del menú desplegable automáticamente
 function updateWeekSelector() {
     if (!weekSelect) return;
     const currentValue = weekSelect.value;
@@ -87,7 +86,7 @@ function updateWeekSelector() {
     weekSelect.value = currentValue;
 }
 
-function renderSchedule(lista) {
+function renderSchedule(lista, tarjetaSeleccionadaId = null) {
     if (!scheduleContainer) return;
     scheduleContainer.innerHTML = '';
     
@@ -98,7 +97,7 @@ function renderSchedule(lista) {
 
     lista.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'schedule-card';
+        card.className = `schedule-card ${item.week === tarjetaSeleccionadaId ? 'highlight-card' : ''}`;
         
         const tasksHtml = item.tasks.map(t => `<li>${t}</li>`).join('');
 
@@ -122,9 +121,19 @@ function renderSchedule(lista) {
         `;
         scheduleContainer.appendChild(card);
     });
+
+    // Centrar exactamente en el medio de la pantalla al seleccionar del menú
+    if (tarjetaSeleccionadaId && tarjetaSeleccionadaId !== 'all') {
+        const targetCard = scheduleContainer.querySelector('.highlight-card');
+        if (targetCard) {
+            setTimeout(() => {
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+            }, 100);
+        }
+    }
 }
 
-// Filtrar al cambiar de opción en el menú
+// Al cambiar el selector en el menú
 if (weekSelect) {
     weekSelect.addEventListener('change', (e) => {
         const seleccion = e.target.value;
@@ -132,7 +141,7 @@ if (weekSelect) {
             renderSchedule(scheduleData);
         } else {
             const filtrados = scheduleData.filter(item => item.week === seleccion);
-            renderSchedule(filtrados);
+            renderSchedule(filtrados, seleccion);
         }
     });
 }
@@ -214,6 +223,5 @@ if (resetBtn) {
     });
 }
 
-// Inicializar
 updateWeekSelector();
 renderSchedule(scheduleData);
