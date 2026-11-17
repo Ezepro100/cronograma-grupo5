@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="robots" content="noindex">
+  <title>Administración - Cronograma Grupo 5</title>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="modulepreload" href="js/db.js">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><svg class="i" aria-hidden="true"><use href="#i-broom"/></svg> Panel de Administración</h1>
+      <p class="subtitle">Grupo 5 • Cronograma de Limpieza</p>
+    </header>
+
+    <!-- Login -->
+    <section id="login" class="panel login" hidden>
+      <h2><svg class="i" aria-hidden="true"><use href="#i-lock"/></svg> Iniciar sesión</h2>
+      <form id="login-form">
+        <label class="field"><span>Correo</span><input type="email" name="email" required autocomplete="username"></label>
+        <label class="field"><span>Contraseña</span><input type="password" name="password" required autocomplete="current-password"></label>
+        <p class="error" id="login-error" hidden></p>
+        <button class="btn-primary" type="submit">Entrar</button>
+        <a href="index.html" class="admin-link"><svg class="i" aria-hidden="true"><use href="#i-eye"/></svg> Volver al cronograma</a>
+      </form>
+    </section>
+
+    <!-- App -->
+    <section id="app" hidden>
+      <div class="topbar">
+        <div class="tabs" role="tablist">
+          <button role="tab" data-tab="semanas" aria-selected="true"><svg class="i"><use href="#i-calendar"/></svg> Semanas</button>
+          <button role="tab" data-tab="voluntarios" aria-selected="false"><svg class="i"><use href="#i-users"/></svg> Voluntarios</button>
+          <button role="tab" data-tab="plantilla" aria-selected="false"><svg class="i"><use href="#i-tasks"/></svg> Tareas base</button>
+        </div>
+        <a href="index.html" class="btn-secondary admin-link" target="_blank" rel="noopener"><svg class="i"><use href="#i-eye"/></svg> Vista usuario</a>
+        <span class="user" id="user-email"></span>
+        <button class="btn-secondary" id="logout-btn"><svg class="i"><use href="#i-logout"/></svg> Salir</button>
+      </div>
+
+      <!-- Semanas -->
+      <section class="panel" id="tab-semanas">
+        <div class="tab-head">
+          <div class="stats" id="stats"></div>
+          <button class="btn-primary" id="new-week"><svg class="i"><use href="#i-plus"/></svg> Nueva semana</button>
+        </div>
+        <div class="schedule-grid" id="admin-grid"><div class="skeleton"></div></div>
+      </section>
+
+      <!-- Voluntarios -->
+      <section class="panel" id="tab-voluntarios" hidden>
+        <div class="tab-head"><h2>Voluntarios</h2><span class="meta" id="vol-count"></span></div>
+        <form class="add-row" id="vol-form">
+          <input name="nombre" placeholder="Nombre y apellido" required maxlength="60">
+          <button class="btn-primary" type="submit"><svg class="i"><use href="#i-user-plus"/></svg> Agregar</button>
+        </form>
+        <div class="rows" id="vol-list-rows"></div>
+      </section>
+
+      <!-- Plantilla de tareas -->
+      <section class="panel" id="tab-plantilla" hidden>
+        <div class="tab-head">
+          <h2>Tareas base</h2>
+          <span class="meta">Se usan al crear una semana nueva. Los cambios se guardan solos.</span>
+        </div>
+        <form class="add-row" id="tpl-form">
+          <input name="nombre" placeholder="Nombre de la tarea" required maxlength="60">
+          <input name="cupos" type="number" min="1" max="10" value="1" title="Voluntarios">
+          <button class="btn-primary" type="submit"><svg class="i"><use href="#i-plus"/></svg> Agregar</button>
+        </form>
+        <div class="rows" id="tpl-rows"></div>
+      </section>
+    </section>
+  </div>
+
+  <!-- Editor de semana -->
+  <dialog id="dlg-semana">
+    <form id="semana-form" method="dialog">
+      <div class="dlg-head">
+        <h2 id="dlg-title">Editar semana</h2>
+        <button type="button" class="icon-btn" data-close title="Cerrar"><svg class="i"><use href="#i-x"/></svg></button>
+      </div>
+      <div class="dlg-body">
+        <div class="grid-2">
+          <label class="field"><span>Semana / Período</span><input name="titulo" required maxlength="40"></label>
+          <label class="field"><span>Fecha</span><input name="fecha" type="date" required></label>
+        </div>
+        <label class="field"><span>Capitán del grupo</span><input name="capitan" list="vol-list" required maxlength="60" autocomplete="off"></label>
+        <div class="section-title">
+          <span>Tareas y voluntarios</span>
+          <span class="btns">
+            <button type="button" class="btn-secondary" id="use-tpl">Usar tareas base</button>
+            <button type="button" class="btn-secondary" id="add-task"><svg class="i"><use href="#i-plus"/></svg> Tarea</button>
+          </span>
+        </div>
+        <p class="warn" id="dup-warn" hidden></p>
+        <div id="task-editors" class="rows"></div>
+      </div>
+      <div class="dlg-foot">
+        <button type="button" class="btn-secondary" data-close>Cancelar</button>
+        <button type="submit" class="btn-primary" id="save-week"><svg class="i"><use href="#i-check"/></svg> Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <datalist id="vol-list"></datalist>
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

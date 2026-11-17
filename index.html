@@ -1,66 +1,49 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cronograma de Limpieza - Grupo 5</title>
-    <link rel="stylesheet" href="style.css?v=33">
-    <!-- FontAwesome para iconos modernos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="description" content="Cronograma de limpieza del Grupo 5: turnos, capitanes y voluntarios asignados.">
+  <title>Cronograma de Limpieza - Grupo 5</title>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+  <link rel="modulepreload" href="js/db.js">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fa-solid fa-broom"></i> Cronograma de Limpieza</h1>
-            <p class="subtitle">Grupo 5 • Organización y Turnos</p>
-        </header>
+  <div class="container">
+    <header>
+      <h1><svg class="i" aria-hidden="true"><use href="#i-broom"/></svg> Cronograma de Limpieza</h1>
+      <p class="subtitle">Grupo 5 • Organización y Turnos</p>
+    </header>
 
-        <!-- Menú desplegable para seleccionar la semana -->
-        <div class="filter-box">
-            <label for="week-select"><i class="fa-solid fa-filter"></i> Seleccionar Semana:</label>
-            <select id="week-select">
-                <option value="all">Todas las semanas</option>
-            </select>
-        </div>
+    <section class="toolbar" aria-label="Filtros">
+      <label class="field">
+        <span>Semana</span>
+        <select id="week-select">
+          <option value="proximas">Próximas semanas</option>
+          <option value="all">Todas las semanas</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>¿Cuándo me toca?</span>
+        <input id="search" type="search" placeholder="Escribe tu nombre…" autocomplete="off">
+      </label>
+      <button id="toggle-all" class="btn-secondary" type="button">Ver todos los nombres</button>
+    </section>
 
-        <div class="actions">
-            <button id="add-btn" class="btn-primary"><i class="fa-solid fa-plus"></i> Nueva Semana</button>
-            <button id="reset-btn" class="btn-secondary"><i class="fa-solid fa-rotate-right"></i> Restaurar</button>
-        </div>
+    <p id="search-result" class="search-result" hidden></p>
 
-        <div class="schedule-grid" id="schedule-container">
-            <!-- Las tarjetas se generan dinámicamente con JavaScript -->
-        </div>
-    </div>
+    <main class="schedule-grid" id="schedule-container" aria-live="polite">
+      <div class="skeleton"></div><div class="skeleton"></div>
+    </main>
 
-    <!-- Modal para Agregar / Editar Turnos -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span id="close-modal" class="close">&times;</span>
-            <h2 id="modal-title">Editar Turno</h2>
-            <form id="schedule-form">
-                <input type="hidden" id="item-id">
-                <div class="form-group">
-                    <label for="week-input">Semana / Período:</label>
-                    <input type="text" id="week-input" required placeholder="Ej. Semana 1">
-                </div>
-                <div class="form-group">
-                    <label for="date-input">Fechas:</label>
-                    <input type="text" id="date-input" required placeholder="Ej. 19 Noviembre">
-                </div>
-                <div class="form-group">
-                    <label for="captain-input">Capitán del Grupo:</label>
-                    <input type="text" id="captain-input" required placeholder="Nombre del Capitán">
-                </div>
-                <div class="form-group">
-                    <label for="tasks-input">Tareas (separadas por coma):</label>
-                    <input type="text" id="tasks-input" required placeholder="Baños, Auditorio principal">
-                </div>
-                <button type="submit" class="btn-primary btn-block">Guardar Cambios</button>
-            </form>
-        </div>
-    </div>
+    <footer>
+      <a href="admin.html" class="admin-link"><svg class="i" aria-hidden="true"><use href="#i-lock"/></svg> Acceso administrador</a>
+    </footer>
+  </div>
 
-    <script src="script.js?v=33"></script>
+  <script type="module" src="js/user.js"></script>
 </body>
 </html>

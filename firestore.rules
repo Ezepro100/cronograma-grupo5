@@ -1,0 +1,39 @@
+rules_version = '2';
+// Reglas de seguridad de Firestore para el Cronograma Grupo 5.
+// Pegar en: Consola Firebase → Firestore Database → Reglas → Publicar.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin = usuario autenticado cuyo email (en minúsculas) existe como documento en /admins
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower()));
+    }
+
+    // Solo el propio usuario puede verificar si es admin; nadie escribe desde la web.
+    match /admins/{email} {
+      allow read: if request.auth != null && request.auth.token.email.lower() == email;
+      allow write: if false;
+    }
+
+    // Cronograma: lectura pública (vista de usuario), escritura solo admin.
+    match /semanas/{id} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.fecha is string
+        && request.resource.data.capitan is string
+        && request.resource.data.tareas is list
+        && request.resource.data.tareas.size() <= 30;
+      allow delete: if isAdmin();
+    }
+
+    // Catálogos internos: solo admin.
+    match /voluntarios/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /plantilla/{id} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
