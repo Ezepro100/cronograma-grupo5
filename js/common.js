@@ -36,6 +36,7 @@ export function toast(msg, tipo = 'ok') {
   el.className = `toast ${tipo}`;
   el.innerHTML = `${icon(tipo === 'error' ? 'alert' : 'check')}<span>${esc(msg)}</span>`;
   box.append(el);
+  while (box.children.length > 3) box.firstElementChild.remove();
   setTimeout(() => el.classList.add('out'), 2600);
   setTimeout(() => el.remove(), 3000);
 }

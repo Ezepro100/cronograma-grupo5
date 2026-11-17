@@ -11,37 +11,22 @@
   <link rel="modulepreload" href="js/db.js">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="vista-usuario">
   <div class="container">
     <header>
       <h1><svg class="i" aria-hidden="true"><use href="#i-broom"/></svg> Cronograma de Limpieza</h1>
       <p class="subtitle">Grupo 5 • Organización y Turnos</p>
     </header>
 
-    <section class="toolbar" aria-label="Filtros">
-      <label class="field">
-        <span>Semana</span>
-        <select id="week-select">
-          <option value="proximas">Próximas semanas</option>
-          <option value="all">Todas las semanas</option>
-        </select>
-      </label>
-      <label class="field">
-        <span>¿Cuándo me toca?</span>
-        <input id="search" type="search" placeholder="Escribe tu nombre…" autocomplete="off">
-      </label>
-      <button id="toggle-all" class="btn-secondary" type="button">Ver todos los nombres</button>
-    </section>
+    <nav class="week-nav" aria-label="Elegir turno">
+      <button type="button" data-rel="-1"><span class="lbl">Anterior</span><small></small></button>
+      <button type="button" data-rel="0" aria-pressed="true"><span class="lbl">Actual</span><small></small></button>
+      <button type="button" data-rel="1"><span class="lbl">Próxima</span><small></small></button>
+    </nav>
 
-    <p id="search-result" class="search-result" hidden></p>
-
-    <main class="schedule-grid" id="schedule-container" aria-live="polite">
-      <div class="skeleton"></div><div class="skeleton"></div>
+    <main class="single-card" id="schedule-container" aria-live="polite">
+      <div class="skeleton"></div>
     </main>
-
-    <footer>
-      <a href="admin.html" class="admin-link"><svg class="i" aria-hidden="true"><use href="#i-lock"/></svg> Acceso administrador</a>
-    </footer>
   </div>
 
   <script type="module" src="js/user.js"></script>

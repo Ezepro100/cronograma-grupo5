@@ -4,8 +4,8 @@ Sitio estático (GitHub Pages) con base de datos en **Firebase Firestore**.
 
 | Página | Para quién | Qué hace |
 |---|---|---|
-| `index.html` | Todos | Ver semanas, capitán, tareas y **qué voluntarios tiene asignados cada tarea** (tocar la tarea). Buscar "¿Cuándo me toca?" por nombre. Se actualiza en vivo. |
-| `admin.html` | Administradores | Login + CRUD de **semanas** (con asignación de voluntarios por cupo), **voluntarios** y **tareas base**. |
+| `index.html` | Todos | **Solo lectura.** Una tarjeta centrada con el turno **Anterior · Actual · Próximo** (botones, flechas ← → o deslizar en el celular). Muestra capitán, tareas y voluntarios asignados. Se actualiza en vivo. |
+| `admin.html` | Administradores (entrar escribiendo `/admin.html` en la URL) | Login + CRUD de **semanas** (con asignación de voluntarios por cupo), **voluntarios** y **tareas base**. |
 
 Sin configurar Firebase, el sitio funciona en **modo local** (datos solo en ese navegador) para probar.
 

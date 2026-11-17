@@ -1,5 +1,6 @@
 // Render de la tarjeta de una semana, compartido por la vista de usuario y la de admin.
 import { esc, fmtFecha, asignados, norm } from './common.js';
+
 import { icon } from './icons.js';
 
 /**
@@ -15,22 +16,26 @@ export function cardHTML(s, o = {}) {
 
   const items = tareas.map((t, i) => {
     const cupos = Number(t.cupos) || 0;
-    const nombres = asignados(t);
-    const n = Math.min(nombres.length, cupos);
+    const vols = Array.from({ length: cupos }, (_, k) => String((t.voluntarios || [])[k] ?? '').trim());
+    const n = vols.filter(Boolean).length;
     const estado = n === 0 ? 'vacia' : n < cupos ? 'parcial' : 'completa';
-    const match = q && nombres.some(v => norm(v).includes(q));
+    const match = q && vols.some(v => v && norm(v).includes(q));
     const abierta = o.admin || match || o.abiertas?.has(`${s.id}:${i}`);
-    const chips = [
-      ...nombres.map(v => `<span class="chip${q && norm(v).includes(q) ? ' match' : ''}">${esc(v)}</span>`),
-      ...Array(Math.max(0, cupos - nombres.length)).fill(`<span class="chip libre">Cupo libre</span>`)
-    ].join('');
+    const chips = vols.map((v, k) => {
+      const cls = v ? `chip${q && norm(v).includes(q) ? ' match' : ''}` : 'chip libre';
+      const txt = v ? esc(v) : 'Cupo libre';
+      return o.admin
+        ? `<button type="button" class="${cls}" data-act="slot" data-id="${s.id}" data-t="${i}" data-k="${k}" title="${v ? 'Cambiar voluntario' : 'Asignar voluntario'}">${txt}</button>`
+        : `<span class="${cls}">${txt}</span>`;
+    }).join('');
+    const ring = `<span class="ring" style="--p:${cupos ? Math.round((n / cupos) * 100) : 0}" aria-label="${n} de ${cupos} asignados">${n}/${cupos}</span>`;
+    const chipsBox = `<div class="chips">${chips || '<span class="chip libre">Sin cupos</span>'}</div>`;
+    if (o.estatico) {
+      return `<li class="task static ${estado}"><div class="task-row">${ring}<span class="task-name">${esc(t.nombre)}</span></div>${chipsBox}</li>`;
+    }
     return `<li><details class="task ${estado}${match ? ' match' : ''}" data-key="${s.id}:${i}"${abierta ? ' open' : ''}>
-      <summary>
-        <span class="ring" style="--p:${cupos ? Math.round((n / cupos) * 100) : 0}" aria-label="${n} de ${cupos} asignados">${n}/${cupos}</span>
-        <span class="task-name">${esc(t.nombre)}</span>
-        ${icon('chevron', 'chev')}
-      </summary>
-      <div class="chips">${chips || '<span class="chip libre">Sin cupos</span>'}</div>
+      <summary>${ring}<span class="task-name">${esc(t.nombre)}</span>${icon('chevron', 'chev')}</summary>
+      ${chipsBox}
     </details></li>`;
   }).join('');
 
@@ -45,7 +50,7 @@ export function cardHTML(s, o = {}) {
   return `<article class="schedule-card${o.proxima ? ' proxima' : ''}${o.pasada ? ' pasada' : ''}" id="s-${s.id}">
     <div class="card-header">
       <span class="week-badge">${esc(s.titulo || 'Semana')}</span>
-      ${o.proxima ? `<span class="next-badge">${icon('star')} Próxima</span>` : ''}
+      ${(o.etiqueta ?? (o.proxima ? 'Próxima' : '')) ? `<span class="next-badge">${icon('star')} ${esc(o.etiqueta ?? 'Próxima')}</span>` : ''}
       ${acciones}
     </div>
     <p class="date-text">${icon('calendar')} ${esc(fmtFecha(s.fecha))}</p>

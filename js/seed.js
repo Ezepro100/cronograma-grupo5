@@ -19,4 +19,4 @@ export const SEMANAS = [
 ].map(s => ({ ...s, tareas: tareasVacias() }));
 
 export const VOLUNTARIOS = ['Daniel Casique', 'Alberto Bardalez', 'Marco Yovera', 'Rodolfo Medrano']
-  .map(nombre => ({ nombre }));
+  .map(nombre => ({ nombre, rol: 'capitan', equipo: '' }));

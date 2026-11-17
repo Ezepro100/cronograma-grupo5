@@ -67,14 +67,47 @@ document.querySelector('.tabs').addEventListener('click', e => {
 
 /* ============================ Datos en vivo ============================ */
 function iniciar() {
-  subscribe('semanas', d => { state.semanas = d; renderSemanas(); renderVoluntarios(); }, fallo);
-  subscribe('voluntarios', d => { state.voluntarios = d; renderVoluntarios(); renderDatalist(); renderStats(); }, fallo);
+  subscribe('semanas', d => { state.semanas = d; renderSemanas(); renderVoluntarios(); renderListas(); }, fallo);
+  subscribe('voluntarios', d => { state.voluntarios = d; renderVoluntarios(); renderListas(); renderStats(); }, fallo);
   subscribe('plantilla', d => { state.plantilla = d; renderPlantilla(); }, fallo);
 }
 
-function renderDatalist() {
-  $('vol-list').innerHTML = state.voluntarios.map(v => `<option value="${esc(v.nombre)}">`).join('');
+/* ---------- Capitanes y equipos ---------- */
+// Un voluntario es capitán si tiene rol 'capitan'; los registros antiguos sin rol
+// se consideran capitanes si figuran como capitán de alguna semana.
+const capsSemanas = () => new Set(state.semanas.map(s => norm(s.capitan)).filter(Boolean));
+const esCapitan = (v, cs = capsSemanas()) => (v.rol ? v.rol === 'capitan' : cs.has(norm(v.nombre)));
+
+function capitanes() {
+  const cs = capsSemanas();
+  const m = new Map();
+  state.voluntarios.filter(v => esCapitan(v, cs)).forEach(v => m.set(norm(v.nombre), v.nombre));
+  state.semanas.forEach(s => s.capitan && !m.has(norm(s.capitan)) && m.set(norm(s.capitan), s.capitan));
+  return [...m.values()].sort((a, b) => a.localeCompare(b, 'es'));
 }
+
+const equipoDe = cap => {
+  const cs = capsSemanas();
+  return state.voluntarios.filter(v => !esCapitan(v, cs) && cap && norm(v.equipo) === norm(cap));
+};
+
+/** Datalists del editor: el equipo del capitán indicado aparece primero. */
+function renderListas(cap = '') {
+  const equipo = equipoDe(cap).map(v => v.nombre);
+  const enEquipo = new Set(equipo.map(norm));
+  const resto = state.voluntarios.map(v => v.nombre).filter(n => !enEquipo.has(norm(n)));
+  $('vol-list').innerHTML = [
+    ...equipo.map(n => `<option value="${esc(n)}">Equipo de ${esc(cap)}</option>`),
+    ...resto.map(n => `<option value="${esc(n)}">`)
+  ].join('');
+  $('cap-list').innerHTML = capitanes().map(n => `<option value="${esc(n)}">`).join('');
+}
+
+const opcionesEquipo = (sel = '') => [
+  `<option value="__cap"${sel === '__cap' ? ' selected' : ''}>★ Es capitán</option>`,
+  `<option value=""${sel === '' ? ' selected' : ''}>Sin equipo</option>`,
+  ...capitanes().map(c => `<option value="${esc(c)}"${norm(sel) === norm(c) && sel !== '__cap' ? ' selected' : ''}>Equipo de ${esc(c)}</option>`)
+].join('');
 
 function renderStats() {
   const hoy = hoyISO();
@@ -104,6 +137,7 @@ $('admin-grid').addEventListener('click', async e => {
   if (!b) return;
   const s = state.semanas.find(x => x.id === b.dataset.id);
   switch (b.dataset.act) {
+    case 'slot': return editarCupo(b, s);
     case 'editar': return abrirEditor(s);
     case 'duplicar': return abrirEditor({ ...structuredClone(s), id: null, ...siguiente() }, 'Duplicar semana');
     case 'eliminar':
@@ -116,6 +150,43 @@ $('admin-grid').addEventListener('click', async e => {
       return seed().then(() => toast('Datos iniciales cargados')).catch(fallo);
   }
 });
+
+/** Asignación rápida: tocar un cupo en la tarjeta abre un selector con el equipo del capitán primero. */
+function editarCupo(chip, s) {
+  const ti = +chip.dataset.t, k = +chip.dataset.k;
+  const tarea = s.tareas[ti];
+  const actual = (tarea.voluntarios || [])[k] || '';
+  const equipo = equipoDe(s.capitan).map(v => v.nombre);
+  const enEquipo = new Set(equipo.map(norm));
+  const otros = state.voluntarios.map(v => v.nombre).filter(n => !enEquipo.has(norm(n)));
+  const usados = new Set(s.tareas.flatMap(asignados).map(norm));
+  const opt = n => `<option value="${esc(n)}"${norm(n) === norm(actual) ? ' selected' : ''}>${esc(n)}${usados.has(norm(n)) && norm(n) !== norm(actual) ? ' (ya asignado)' : ''}</option>`;
+
+  const sel = document.createElement('select');
+  sel.className = 'slot-select';
+  sel.setAttribute('aria-label', `Voluntario para ${tarea.nombre}`);
+  sel.innerHTML = `<option value="">— Cupo libre —</option>
+    ${actual && !state.voluntarios.some(v => norm(v.nombre) === norm(actual)) ? opt(actual) : ''}
+    <optgroup label="Equipo de ${esc(s.capitan || 'capitán')}">${equipo.map(opt).join('') || '<option disabled>(sin voluntarios en su equipo)</option>'}</optgroup>
+    ${otros.length ? `<optgroup label="Otros voluntarios">${otros.map(opt).join('')}</optgroup>` : ''}`;
+  chip.replaceWith(sel);
+  sel.focus();
+  try { sel.showPicker(); } catch { /* navegador sin showPicker */ }
+
+  let guardando = false;
+  sel.addEventListener('change', async () => {
+    guardando = true;
+    const tareas = structuredClone(s.tareas);
+    const vols = Array.from({ length: clampCupos(tareas[ti].cupos) }, (_, i) => (tareas[ti].voluntarios || [])[i] || '');
+    vols[k] = sel.value;
+    tareas[ti].voluntarios = vols;
+    try {
+      await save('semanas', { ...s, tareas });
+      toast(sel.value ? `${sel.value} → ${tareas[ti].nombre}` : 'Cupo liberado');
+    } catch (err) { fallo(err); renderSemanas(); }
+  });
+  sel.addEventListener('blur', () => setTimeout(() => !guardando && renderSemanas(), 200));
+}
 
 /** Título y fecha sugeridos para una semana nueva (cada 3 semanas, como el cronograma original). */
 function siguiente() {
@@ -181,6 +252,15 @@ function revisarDuplicados() {
   return dups.size;
 }
 
+function infoEquipo() {
+  const cap = $form.capitan.value.trim();
+  const eq = equipoDe(cap).map(v => v.nombre);
+  $('team-info').innerHTML = !cap ? '' : eq.length
+    ? `Equipo de ${esc(cap)} (${eq.length}): <b>${eq.map(esc).join(', ')}</b>`
+    : `${esc(cap)} aún no tiene voluntarios en su equipo (asígnalos en la pestaña Voluntarios).`;
+  renderListas(cap);
+}
+
 function abrirEditor(s, titulo = 'Editar semana') {
   state.editId = s.id || null;
   $('dlg-title').textContent = titulo;
@@ -188,8 +268,22 @@ function abrirEditor(s, titulo = 'Editar semana') {
   $form.fecha.value = s.fecha || '';
   $form.capitan.value = s.capitan || '';
   pintarTareas(s.tareas || []);
+  infoEquipo();
   $dlg.showModal();
 }
+
+$form.capitan.addEventListener('input', infoEquipo);
+
+$('fill-team').addEventListener('click', () => {
+  const inputs = [...$tasks.querySelectorAll('.slots input')];
+  const usados = new Set(inputs.map(i => norm(i.value)).filter(Boolean));
+  const libres = equipoDe($form.capitan.value.trim()).map(v => v.nombre).filter(n => !usados.has(norm(n)));
+  if (!libres.length) return toast('No quedan voluntarios del equipo sin asignar', 'error');
+  let n = 0;
+  inputs.filter(i => !i.value.trim()).forEach(i => { if (libres.length) { i.value = libres.shift(); n++; } });
+  revisarDuplicados();
+  toast(n ? `${n} cupo(s) completados con el equipo` : 'No hay cupos vacíos');
+});
 
 $tasks.addEventListener('input', e => {
   if (e.target.name === 'cupos') {
@@ -249,8 +343,11 @@ $form.addEventListener('submit', async e => {
     await save('semanas', semana);
     // Los nombres nuevos se suman solos al catálogo de voluntarios
     const conocidos = new Set(state.voluntarios.map(v => norm(v.nombre)));
-    const nuevos = [...new Set([semana.capitan, ...tareas.flatMap(asignados)].filter(n => n && !conocidos.has(norm(n))))];
-    if (nuevos.length) await saveMany('voluntarios', nuevos.map(nombre => ({ nombre })));
+    const nuevos = [];
+    if (semana.capitan && !conocidos.has(norm(semana.capitan))) nuevos.push({ nombre: semana.capitan, rol: 'capitan', equipo: '' });
+    [...new Set(tareas.flatMap(asignados))].filter(n => !conocidos.has(norm(n)) && norm(n) !== norm(semana.capitan))
+      .forEach(nombre => nuevos.push({ nombre, rol: 'voluntario', equipo: semana.capitan }));
+    if (nuevos.length) await saveMany('voluntarios', nuevos);
     $dlg.close();
     toast(nuevos.length ? `Semana guardada · ${nuevos.length} voluntario(s) nuevo(s) en el catálogo` : 'Semana guardada');
   } catch (err) {
@@ -261,30 +358,60 @@ $form.addEventListener('submit', async e => {
 });
 
 /* ============================ Voluntarios ============================ */
-function usos(nombre) {
-  const k = norm(nombre);
-  return state.semanas.filter(s => norm(s.capitan) === k || (s.tareas || []).some(t => asignados(t).some(v => norm(v) === k))).length;
+function filaVoluntario(v, esCap) {
+  const n = usos(v.nombre);
+  const sel = esCap ? '__cap' : v.equipo || '';
+  return `<div class="row${esCap ? ' cap' : ''}" data-id="${v.id}">
+    <div class="grow"><input value="${esc(v.nombre)}" data-field="nombre" maxlength="60" aria-label="Nombre"></div>
+    <select data-field="equipo" aria-label="Rol o equipo">${opcionesEquipo(sel)}</select>
+    <span class="meta">${n ? `${n} semana${n > 1 ? 's' : ''}` : 'Sin asignar'}</span>
+    <button class="icon-btn danger" data-del title="Eliminar">${icon('trash')}</button>
+  </div>`;
 }
 
 function renderVoluntarios() {
-  $('vol-count').textContent = `${state.voluntarios.length} registrados`;
-  $('vol-list-rows').innerHTML = state.voluntarios.map(v => {
-    const n = usos(v.nombre);
-    return `<div class="row" data-id="${v.id}">
-      <div class="grow"><input value="${esc(v.nombre)}" data-field="nombre" maxlength="60" aria-label="Nombre"></div>
-      <span class="meta">${n ? `${n} semana${n > 1 ? 's' : ''}` : 'Sin asignar'}</span>
-      <button class="icon-btn danger" data-del title="Eliminar">${icon('trash')}</button>
+  const cs = capsSemanas();
+  const caps = capitanes();
+  const total = state.voluntarios.length;
+  $('vol-count').textContent = `${caps.length} capitanes · ${total - state.voluntarios.filter(v => esCapitan(v, cs)).length} voluntarios`;
+
+  const grupos = caps.map(c => {
+    const capDoc = state.voluntarios.find(v => norm(v.nombre) === norm(c));
+    const miembros = equipoDe(c);
+    return `<div class="group">
+      <div class="group-head">${icon('captain')} ${esc(c)} <span class="meta">${miembros.length} en su equipo</span></div>
+      ${capDoc ? filaVoluntario(capDoc, true) : ''}
+      ${miembros.map(v => filaVoluntario(v, false)).join('') || '<p class="meta" style="padding:0 .3rem">Sin voluntarios aún.</p>'}
     </div>`;
-  }).join('') || '<p class="meta">Aún no hay voluntarios.</p>';
+  });
+  const capsN = new Set(caps.map(norm));
+  const sueltos = state.voluntarios.filter(v => !esCapitan(v, cs) && !capsN.has(norm(v.equipo)));
+  if (sueltos.length) grupos.push(`<div class="group sin-equipo">
+      <div class="group-head">${icon('users')} Sin equipo <span class="meta">${sueltos.length}</span></div>
+      ${sueltos.map(v => filaVoluntario(v, false)).join('')}
+    </div>`);
+
+  $('vol-list-rows').innerHTML = grupos.join('') || '<p class="meta">Aún no hay voluntarios.</p>';
+  const $eq = $('vol-equipo');
+  const prev = $eq.value;
+  $eq.innerHTML = opcionesEquipo(prev || '');
 }
+
+const rolDe = valor => (valor === '__cap' ? { rol: 'capitan', equipo: '' } : { rol: 'voluntario', equipo: valor });
 
 $('vol-form').addEventListener('submit', e => {
   e.preventDefault();
   const nombre = e.target.nombre.value.trim();
   if (!nombre) return;
-  if (state.voluntarios.some(v => norm(v.nombre) === norm(nombre))) return toast('Ese voluntario ya existe', 'error');
-  save('voluntarios', { nombre }).then(() => { e.target.reset(); toast('Voluntario agregado'); }).catch(fallo);
+  if (state.voluntarios.some(v => norm(v.nombre) === norm(nombre))) return toast('Ese nombre ya existe', 'error');
+  save('voluntarios', { nombre, ...rolDe(e.target.equipo.value) })
+    .then(() => { e.target.nombre.value = ''; e.target.nombre.focus(); toast('Agregado'); }).catch(fallo);
 });
+
+function usos(nombre) {
+  const k = norm(nombre);
+  return state.semanas.filter(s => norm(s.capitan) === k || (s.tareas || []).some(t => asignados(t).some(v => norm(v) === k))).length;
+}
 
 /** Reemplaza un nombre en todas las semanas (capitán y asignaciones). */
 async function reemplazarEnSemanas(viejo, nuevo) {
@@ -299,30 +426,47 @@ async function reemplazarEnSemanas(viejo, nuevo) {
   return afectadas.length;
 }
 
+/** Cambia el campo equipo de los miembros de un capitán (renombre o baja del capitán). */
+const moverEquipo = (cap, nuevo) => {
+  const miembros = equipoDe(cap);
+  return miembros.length ? saveMany('voluntarios', miembros.map(m => ({ ...m, equipo: nuevo }))) : null;
+};
+
 $('vol-list-rows').addEventListener('change', async e => {
   const row = e.target.closest('.row');
   const v = state.voluntarios.find(x => x.id === row?.dataset.id);
-  if (!v || e.target.dataset.field !== 'nombre') return;
-  const nuevo = e.target.value.trim();
-  if (!nuevo || nuevo === v.nombre) { e.target.value = v.nombre; return; }
+  if (!v) return;
+  const eraCap = esCapitan(v);
   try {
+    if (e.target.dataset.field === 'equipo') {
+      const cambio = rolDe(e.target.value);
+      if (eraCap && cambio.rol !== 'capitan' && equipoDe(v.nombre).length &&
+          !confirm(`${v.nombre} dejará de ser capitán y su equipo quedará "Sin equipo". ¿Continuar?`)) return renderVoluntarios();
+      if (eraCap && cambio.rol !== 'capitan') await moverEquipo(v.nombre, '');
+      await save('voluntarios', { ...v, ...cambio });
+      return toast(cambio.rol === 'capitan' ? `${v.nombre} ahora es capitán` : cambio.equipo ? `${v.nombre} → equipo de ${cambio.equipo}` : `${v.nombre} quedó sin equipo`);
+    }
+    const nuevo = e.target.value.trim();
+    if (!nuevo || nuevo === v.nombre) { e.target.value = v.nombre; return; }
     const n = usos(v.nombre);
     const propagar = n && confirm(`"${v.nombre}" está en ${n} semana(s). ¿Actualizar el nombre también allí?`);
-    await save('voluntarios', { id: v.id, nombre: nuevo });
+    if (eraCap) await moverEquipo(v.nombre, nuevo);
+    await save('voluntarios', { ...v, nombre: nuevo });
     if (propagar) await reemplazarEnSemanas(v.nombre, nuevo);
-    toast('Voluntario actualizado');
+    toast('Actualizado');
   } catch (err) { fallo(err); }
 });
 
 $('vol-list-rows').addEventListener('click', async e => {
   if (!e.target.closest('[data-del]')) return;
   const v = state.voluntarios.find(x => x.id === e.target.closest('.row').dataset.id);
-  if (!v || !confirm(`¿Eliminar a "${v.nombre}" del catálogo?`)) return;
+  if (!v || !confirm(`¿Eliminar a "${v.nombre}"?`)) return;
   try {
+    if (esCapitan(v)) await moverEquipo(v.nombre, '');
     await remove('voluntarios', v.id);
     const n = usos(v.nombre);
     if (n && confirm(`También está asignado en ${n} semana(s). ¿Quitarlo de esas asignaciones?`)) await reemplazarEnSemanas(v.nombre, '');
-    toast('Voluntario eliminado');
+    toast('Eliminado');
   } catch (err) { fallo(err); }
 });
 

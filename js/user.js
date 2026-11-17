@@ -1,83 +1,71 @@
-// Vista pública (solo lectura).
+// Vista pública: solo lectura, una tarjeta a la vez (Anterior · Actual · Próxima).
 import './icons.js';
 import { subscribe } from './db.js';
-import { esc, hoyISO, proximaId, norm, asignados, bannerModo } from './common.js';
+import { hoyISO, bannerModo } from './common.js';
 import { cardHTML } from './cards.js';
 
 bannerModo();
 
-const $grid = document.getElementById('schedule-container');
-const $select = document.getElementById('week-select');
-const $search = document.getElementById('search');
-const $result = document.getElementById('search-result');
-const $toggle = document.getElementById('toggle-all');
+const $card = document.getElementById('schedule-container');
+const $btns = [...document.querySelectorAll('.week-nav button')];
+const corto = new Intl.DateTimeFormat('es', { day: 'numeric', month: 'short' });
 
 let semanas = [];
-const abiertas = new Set(); // tareas expandidas por el usuario (se conservan al llegar cambios en vivo)
+let rel = 0; // -1 anterior, 0 actual, 1 próxima
 
-function llenarSelector() {
-  const actual = $select.value;
-  $select.querySelectorAll('option[data-week]').forEach(o => o.remove());
-  semanas.forEach(s => {
-    const o = new Option(`${s.titulo} · ${s.fecha?.split('-').reverse().slice(0, 2).join('/')} · Cap. ${s.capitan}`, s.id);
-    o.dataset.week = '1';
-    $select.add(o);
-  });
-  $select.value = [...$select.options].some(o => o.value === actual) ? actual : 'proximas';
+/** Índice del turno actual: el de hoy o el siguiente; si ya pasaron todos, el último. */
+function indiceActual() {
+  const hoy = hoyISO();
+  const i = semanas.findIndex(s => s.fecha >= hoy);
+  return i === -1 ? semanas.length - 1 : i;
 }
 
 function render() {
-  const sel = $select.value;
-  const q = norm($search.value);
-  const hoy = hoyISO();
-  const prox = proximaId(semanas);
-
-  let lista = sel === 'all' ? semanas : sel === 'proximas' ? semanas.filter(s => s.fecha >= hoy) : semanas.filter(s => s.id === sel);
-  if (sel === 'proximas' && !lista.length) lista = semanas; // si ya pasaron todas, mostrar todo
-
-  if (q) {
-    const hits = [];
-    lista = lista.filter(s => {
-      const tareas = (s.tareas || []).filter(t => asignados(t).some(v => norm(v).includes(q))).map(t => t.nombre);
-      const cap = norm(s.capitan).includes(q);
-      if (tareas.length || cap) hits.push(`<strong>${esc(s.titulo)}</strong>: ${[cap && 'Capitán', ...tareas].filter(Boolean).map(esc).join(', ')}`);
-      return tareas.length || cap;
-    });
-    $result.hidden = false;
-    $result.innerHTML = hits.length ? hits.join(' · ') : 'No hay asignaciones para ese nombre en las semanas mostradas.';
-  } else {
-    $result.hidden = true;
+  if (!semanas.length) {
+    $card.innerHTML = '<p class="no-results">Aún no hay turnos publicados.</p>';
+    $btns.forEach(b => (b.disabled = true));
+    return;
   }
-
-  $grid.innerHTML = lista.length
-    ? lista.map(s => cardHTML(s, { proxima: s.id === prox, pasada: s.fecha < hoy, abiertas, buscar: q })).join('')
-    : '<p class="no-results">No hay turnos para mostrar.</p>';
-
-  if (sel !== 'all' && sel !== 'proximas') document.getElementById(`s-${sel}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const base = indiceActual();
+  $btns.forEach(b => {
+    const s = semanas[base + Number(b.dataset.rel)];
+    b.disabled = !s;
+    b.setAttribute('aria-pressed', Number(b.dataset.rel) === rel);
+    b.querySelector('small').textContent = s?.fecha ? corto.format(new Date(`${s.fecha}T12:00:00`)) : '—';
+  });
+  if (!semanas[base + rel]) rel = 0;
+  const s = semanas[base + rel];
+  const hoy = hoyISO();
+  const etiqueta = rel === -1 ? 'Turno anterior' : rel === 1 ? 'Siguiente turno' : s.fecha === hoy ? 'Hoy' : s.fecha < hoy ? 'Último turno' : 'Turno actual';
+  $card.innerHTML = cardHTML(s, { estatico: true, proxima: rel === 0, pasada: s.fecha < hoy, etiqueta });
 }
 
-// Recordar qué tareas abrió el usuario
-$grid.addEventListener('toggle', e => {
-  const key = e.target.dataset?.key;
-  if (!key) return;
-  e.target.open ? abiertas.add(key) : abiertas.delete(key);
-}, true);
+function ir(nuevo) {
+  if (nuevo < -1 || nuevo > 1 || !semanas[indiceActual() + nuevo] || nuevo === rel) return;
+  rel = nuevo;
+  render();
+}
 
-$toggle.addEventListener('click', () => {
-  const abrir = $toggle.classList.toggle('on');
-  $grid.querySelectorAll('details.task').forEach(d => (d.open = abrir));
-  $toggle.textContent = abrir ? 'Ocultar nombres' : 'Ver todos los nombres';
+$btns.forEach(b => b.addEventListener('click', () => ir(Number(b.dataset.rel))));
+
+// Flechas del teclado y deslizar en el celular
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft') ir(rel - 1);
+  if (e.key === 'ArrowRight') ir(rel + 1);
 });
-
-$select.addEventListener('change', render);
-let t;
-$search.addEventListener('input', () => { clearTimeout(t); t = setTimeout(render, 150); });
+let x0 = null;
+$card.addEventListener('touchstart', e => (x0 = e.touches[0].clientX), { passive: true });
+$card.addEventListener('touchend', e => {
+  if (x0 === null) return;
+  const dx = e.changedTouches[0].clientX - x0;
+  if (Math.abs(dx) > 60) ir(rel + (dx < 0 ? 1 : -1));
+  x0 = null;
+}, { passive: true });
 
 subscribe('semanas', data => {
   semanas = data;
-  llenarSelector();
   render();
 }, err => {
   console.error(err);
-  $grid.innerHTML = '<p class="no-results">No se pudo cargar el cronograma. Revisa tu conexión.</p>';
+  $card.innerHTML = '<p class="no-results">No se pudo cargar el cronograma. Revisa tu conexión.</p>';
 });

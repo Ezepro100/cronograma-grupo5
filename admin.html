@@ -53,9 +53,11 @@
 
       <!-- Voluntarios -->
       <section class="panel" id="tab-voluntarios" hidden>
-        <div class="tab-head"><h2>Voluntarios</h2><span class="meta" id="vol-count"></span></div>
+        <div class="tab-head"><h2>Capitanes y equipos</h2><span class="meta" id="vol-count"></span></div>
+        <p class="meta" style="margin:-.4rem 0 1rem">Marca a cada persona como <b>capitán</b> o asígnala al equipo de un capitán. Al asignar cupos, primero se ofrece el equipo del capitán de esa semana.</p>
         <form class="add-row" id="vol-form">
           <input name="nombre" placeholder="Nombre y apellido" required maxlength="60">
+          <select name="equipo" id="vol-equipo" aria-label="Equipo"></select>
           <button class="btn-primary" type="submit"><svg class="i"><use href="#i-user-plus"/></svg> Agregar</button>
         </form>
         <div class="rows" id="vol-list-rows"></div>
@@ -89,10 +91,12 @@
           <label class="field"><span>Semana / Período</span><input name="titulo" required maxlength="40"></label>
           <label class="field"><span>Fecha</span><input name="fecha" type="date" required></label>
         </div>
-        <label class="field"><span>Capitán del grupo</span><input name="capitan" list="vol-list" required maxlength="60" autocomplete="off"></label>
+        <label class="field"><span>Capitán del grupo (responsable)</span><input name="capitan" list="cap-list" required maxlength="60" autocomplete="off"></label>
+        <p class="team-info" id="team-info"></p>
         <div class="section-title">
           <span>Tareas y voluntarios</span>
           <span class="btns">
+            <button type="button" class="btn-secondary" id="fill-team"><svg class="i"><use href="#i-users"/></svg> Completar con su equipo</button>
             <button type="button" class="btn-secondary" id="use-tpl">Usar tareas base</button>
             <button type="button" class="btn-secondary" id="add-task"><svg class="i"><use href="#i-plus"/></svg> Tarea</button>
           </span>
@@ -108,6 +112,7 @@
   </dialog>
 
   <datalist id="vol-list"></datalist>
+  <datalist id="cap-list"></datalist>
   <script type="module" src="js/admin.js"></script>
 </body>
 </html>
