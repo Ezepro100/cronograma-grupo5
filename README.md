@@ -5,7 +5,7 @@ Sitio estático (GitHub Pages) con base de datos en **Firebase Firestore**.
 | Página | Para quién | Qué hace |
 |---|---|---|
 | `index.html` | Todos | **Solo lectura.** Una tarjeta centrada con el turno **Anterior · Actual · Próximo** (botones, flechas ← → o deslizar en el celular). Muestra capitán, tareas y voluntarios asignados. Se actualiza en vivo. |
-| `admin.html` | Administradores (entrar escribiendo `/admin.html` en la URL) | Login + CRUD de **semanas** (con asignación de voluntarios por cupo), **voluntarios** y **tareas base**. |
+| `admin.html` | Administradores (entrar escribiendo `/admin.html` en la URL) | Login + CRUD de semanas, capitanes/equipos, voluntarios y tareas base. Cada tarea tiene un **ícono de área** (baño varones/mujeres, auditorio, plataforma…). Botón **Compartir** por semana: genera una imagen con lo cargado y la envía con el enlace directo (`?s=ID`). |
 
 Sin configurar Firebase, el sitio funciona en **modo local** (datos solo en ese navegador) para probar.
 

@@ -62,11 +62,11 @@ header h1 .i { color: var(--mint); }
 .toolbar { display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; align-items: end; }
 
 .field { display: flex; flex-direction: column; gap: 6px; font-size: .82rem; color: var(--mint); font-weight: 600; }
-input, select {
+input, select, textarea {
   width: 100%; padding: .7rem .9rem; border-radius: 8px;
   border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; font-size: .92rem;
 }
-input:focus, select:focus { outline: none; border-color: var(--mint); box-shadow: 0 0 0 3px rgba(45, 212, 191, .18); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--mint); box-shadow: 0 0 0 3px rgba(45, 212, 191, .18); }
 
 button {
   cursor: pointer; border: none; padding: .65rem 1.1rem; border-radius: 8px;
@@ -141,17 +141,34 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .chev { color: var(--muted); transition: transform .2s; }
 .task[open] .chev { transform: rotate(180deg); }
 
+/* Insignia del área (ícono por tarea) */
+.area-badge {
+  --c: var(--mint);
+  position: relative; width: 36px; height: 36px; flex: none; border-radius: 10px;
+  display: grid; place-items: center; font-size: 1.1rem; color: var(--c);
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+}
+.area-badge .sub {
+  position: absolute; right: -6px; bottom: -6px; width: 18px; height: 18px; border-radius: 50%;
+  display: grid; place-items: center; font-size: .66rem; background: #0f172a; border: 1px solid var(--c);
+}
+.area-badge .sub .i { stroke-width: 2.6; }
+.icon-pick { display: flex; align-items: center; gap: 8px; }
+.icon-pick select { width: auto; min-width: 170px; padding: .5rem .7rem; font-size: .84rem; }
+.icon-btn.share { color: var(--mint); }
+
 /* Anillo de progreso por tarea */
 .ring {
   --p: 0; --c: var(--muted);
-  width: 34px; height: 34px; flex: none; border-radius: 50%;
-  display: grid; place-items: center; font-size: .68rem; font-weight: 700; color: var(--c);
+  width: 32px; height: 32px; flex: none; border-radius: 50%;
+  display: grid; place-items: center; font-size: .64rem; font-weight: 700; color: var(--c);
   background: radial-gradient(closest-side, #172033 78%, transparent 80% 100%), conic-gradient(var(--c) calc(var(--p) * 1%), rgba(148, 163, 184, .2) 0);
 }
 .task.parcial .ring { --c: var(--amber); }
 .task.completa .ring { --c: var(--mint); }
 
-.chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 12px 58px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 12px 60px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: .8rem; background: rgba(45, 212, 191, .16); color: #ccfbf1; border: 1px solid rgba(45, 212, 191, .35); }
 .chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--mint); }
 .chip.libre { background: transparent; color: var(--muted); border-style: dashed; border-color: var(--border); }
@@ -259,6 +276,18 @@ button.chip.libre:hover { color: var(--mint); }
 .team-info { font-size: .8rem; color: var(--muted); margin-top: -.4rem; }
 .team-info b { color: var(--text); font-weight: 600; }
 
+/* Compartir */
+.task-edit .grow { flex: 1; }
+.share-dlg { width: min(760px, calc(100% - 1.5rem)); }
+.share-dlg h2 { display: flex; align-items: center; gap: 8px; }
+.share-preview { background: #0b1324; border: 1px solid var(--border); border-radius: 12px; padding: .6rem; display: grid; place-items: center; min-height: 160px; }
+.share-preview img { display: block; max-width: 100%; max-height: 52vh; border-radius: 8px; }
+textarea { resize: vertical; font-size: .85rem; line-height: 1.45; }
+.link-row { display: flex; gap: 8px; }
+.link-row input { font-size: .82rem; color: var(--mint); }
+.link-row button { white-space: nowrap; }
+.share-actions { flex-wrap: wrap; }
+
 /* Toasts */
 #toasts { position: fixed; bottom: 1rem; right: 1rem; z-index: 200; display: flex; flex-direction: column; gap: 8px; }
 .toast { display: flex; gap: 8px; align-items: center; padding: .7rem 1rem; border-radius: 10px; background: #0f172a; border: 1px solid var(--mint); box-shadow: 0 10px 25px rgba(0, 0, 0, .5); font-size: .88rem; animation: tin .2s ease-out; transition: opacity .3s, transform .3s; }
@@ -278,6 +307,8 @@ button.chip.libre:hover { color: var(--mint); }
   .tabs { width: 100%; }
   .tabs button { flex: 1; padding: .55rem .4rem; font-size: .8rem; }
   .add-row, .row { flex-wrap: wrap; }
+  .share-actions button { flex: 1 1 45%; }
+  .link-row { flex-direction: column; }
   .row select, .add-row select { flex: 1; }
 }
 

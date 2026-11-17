@@ -1,7 +1,8 @@
 // Render de la tarjeta de una semana, compartido por la vista de usuario y la de admin.
-import { esc, fmtFecha, asignados, norm } from './common.js?v=20261117c';
+import { esc, fmtFecha, asignados, norm } from './common.js?v=20261117d';
 
-import { icon } from './icons.js?v=20261117c';
+import { icon } from './icons.js?v=20261117d';
+import { badgeHTML } from './areas.js?v=20261117d';
 
 /**
  * @param {object} s semana
@@ -31,16 +32,17 @@ export function cardHTML(s, o = {}) {
     const ring = `<span class="ring" style="--p:${cupos ? Math.round((n / cupos) * 100) : 0}" aria-label="${n} de ${cupos} asignados">${n}/${cupos}</span>`;
     const chipsBox = `<div class="chips">${chips || '<span class="chip libre">Sin cupos</span>'}</div>`;
     if (o.estatico) {
-      return `<li class="task static ${estado}"><div class="task-row">${ring}<span class="task-name">${esc(t.nombre)}</span></div>${chipsBox}</li>`;
+      return `<li class="task static ${estado}"><div class="task-row">${badgeHTML(t)}<span class="task-name">${esc(t.nombre)}</span>${ring}</div>${chipsBox}</li>`;
     }
     return `<li><details class="task ${estado}${match ? ' match' : ''}" data-key="${s.id}:${i}"${abierta ? ' open' : ''}>
-      <summary>${ring}<span class="task-name">${esc(t.nombre)}</span>${icon('chevron', 'chev')}</summary>
+      <summary>${badgeHTML(t)}<span class="task-name">${esc(t.nombre)}</span>${ring}${icon('chevron', 'chev')}</summary>
       ${chipsBox}
     </details></li>`;
   }).join('');
 
   const acciones = o.admin
     ? `<div class="card-actions">
+        <button class="icon-btn share" data-act="compartir" data-id="${s.id}" title="Compartir imagen y enlace">${icon('share')}</button>
         <button class="icon-btn" data-act="editar" data-id="${s.id}" title="Editar">${icon('edit')}</button>
         <button class="icon-btn" data-act="duplicar" data-id="${s.id}" title="Duplicar">${icon('copy')}</button>
         <button class="icon-btn danger" data-act="eliminar" data-id="${s.id}" title="Eliminar">${icon('trash')}</button>

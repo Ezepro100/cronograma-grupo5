@@ -7,8 +7,8 @@
   <meta name="robots" content="noindex">
   <title>Administración - Cronograma Grupo 5</title>
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-  <link rel="modulepreload" href="js/db.js?v=20261117c">
-  <link rel="stylesheet" href="css/style.css?v=20261117c">
+  <link rel="modulepreload" href="js/db.js?v=20261117d">
+  <link rel="stylesheet" href="css/style.css?v=20261117d">
 </head>
 <body>
   <div class="container">
@@ -72,6 +72,7 @@
         <form class="add-row" id="tpl-form">
           <input name="nombre" placeholder="Nombre de la tarea" required maxlength="60">
           <input name="cupos" type="number" min="1" max="10" value="1" title="Voluntarios">
+          <select name="icono" id="tpl-icono" aria-label="Ícono"></select>
           <button class="btn-primary" type="submit"><svg class="i"><use href="#i-plus"/></svg> Agregar</button>
         </form>
         <div class="rows" id="tpl-rows"></div>
@@ -113,6 +114,6 @@
 
   <datalist id="vol-list"></datalist>
   <datalist id="cap-list"></datalist>
-  <script type="module" src="js/admin.js?v=20261117c"></script>
+  <script type="module" src="js/admin.js?v=20261117d"></script>
 </body>
 </html>

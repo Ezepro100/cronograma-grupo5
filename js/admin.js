@@ -1,8 +1,10 @@
 // Vista de administrador: login + CRUD de semanas, voluntarios y tareas base.
-import { icon } from './icons.js?v=20261117c';
-import { MODE, subscribe, save, saveMany, remove, seed, onAuth, login, logout, isAdmin } from './db.js?v=20261117c';
-import { esc, norm, asignados, hoyISO, proximaId, toast, bannerModo } from './common.js?v=20261117c';
-import { cardHTML } from './cards.js?v=20261117c';
+import { icon } from './icons.js?v=20261117d';
+import { MODE, subscribe, save, saveMany, remove, seed, onAuth, login, logout, isAdmin } from './db.js?v=20261117d';
+import { esc, norm, asignados, hoyISO, proximaId, toast, bannerModo } from './common.js?v=20261117d';
+import { cardHTML } from './cards.js?v=20261117d';
+import { badgeHTML, opcionesArea } from './areas.js?v=20261117d';
+import { abrirCompartir } from './share.js?v=20261117d';
 
 bannerModo();
 
@@ -138,6 +140,7 @@ $('admin-grid').addEventListener('click', async e => {
   const s = state.semanas.find(x => x.id === b.dataset.id);
   switch (b.dataset.act) {
     case 'slot': return editarCupo(b, s);
+    case 'compartir': return abrirCompartir(s);
     case 'editar': return abrirEditor(s);
     case 'duplicar': return abrirEditor({ ...structuredClone(s), id: null, ...siguiente() }, 'Duplicar semana');
     case 'eliminar':
@@ -198,7 +201,7 @@ function siguiente() {
   };
 }
 
-const tareasBase = () => state.plantilla.map(t => ({ nombre: t.nombre, cupos: clampCupos(t.cupos), voluntarios: Array(clampCupos(t.cupos)).fill('') }));
+const tareasBase = () => state.plantilla.map(t => ({ nombre: t.nombre, icono: t.icono || '', cupos: clampCupos(t.cupos), voluntarios: Array(clampCupos(t.cupos)).fill('') }));
 
 $('new-week').addEventListener('click', () => abrirEditor({ id: null, ...siguiente(), capitan: '', tareas: tareasBase() }, 'Nueva semana'));
 
@@ -216,8 +219,13 @@ function taskEditorHTML(t) {
   const cupos = clampCupos(t.cupos);
   return `<div class="task-edit">
     <div class="top">
+      ${badgeHTML(t)}
       <input name="nombre" value="${esc(t.nombre)}" placeholder="Nombre de la tarea" required maxlength="60" aria-label="Tarea">
       <input name="cupos" type="number" min="1" max="10" value="${cupos}" title="Cantidad de voluntarios" aria-label="Cupos">
+    </div>
+    <div class="top">
+      <label class="icon-pick"><select name="icono" aria-label="Ícono del área">${opcionesArea(t.icono || '')}</select></label>
+      <span class="grow"></span>
       <button type="button" class="icon-btn" data-move="-1" title="Subir">${icon('up')}</button>
       <button type="button" class="icon-btn" data-move="1" title="Bajar">${icon('down')}</button>
       <button type="button" class="icon-btn danger" data-del title="Quitar tarea">${icon('trash')}</button>
@@ -228,6 +236,7 @@ function taskEditorHTML(t) {
 
 const leerTareas = () => [...$tasks.querySelectorAll('.task-edit')].map(el => ({
   nombre: el.querySelector('[name=nombre]').value.trim(),
+  icono: el.querySelector('[name=icono]').value,
   cupos: clampCupos(el.querySelector('[name=cupos]').value),
   voluntarios: [...el.querySelectorAll('.slots input')].map(i => i.value.trim())
 }));
@@ -286,6 +295,11 @@ $('fill-team').addEventListener('click', () => {
 });
 
 $tasks.addEventListener('input', e => {
+  if (e.target.name === 'nombre' || e.target.name === 'icono') {
+    const el = e.target.closest('.task-edit');
+    el.querySelector('.area-badge').outerHTML = badgeHTML({ nombre: el.querySelector('[name=nombre]').value, icono: el.querySelector('[name=icono]').value });
+    return;
+  }
   if (e.target.name === 'cupos') {
     const el = e.target.closest('.task-edit');
     const actuales = [...el.querySelectorAll('.slots input')].map(i => i.value);
@@ -471,9 +485,13 @@ $('vol-list-rows').addEventListener('click', async e => {
 });
 
 /* ============================ Tareas base ============================ */
+$('tpl-icono').innerHTML = opcionesArea();
+
 function renderPlantilla() {
   $('tpl-rows').innerHTML = state.plantilla.map((t, i) => `<div class="row" data-id="${t.id}">
+      ${badgeHTML(t)}
       <div class="grow"><input value="${esc(t.nombre)}" data-field="nombre" maxlength="60" aria-label="Tarea"></div>
+      <select data-field="icono" aria-label="Ícono">${opcionesArea(t.icono || '')}</select>
       <input type="number" min="1" max="10" value="${clampCupos(t.cupos)}" data-field="cupos" title="Voluntarios" aria-label="Cupos">
       <button class="icon-btn" data-move="-1" title="Subir" ${i === 0 ? 'disabled' : ''}>${icon('up')}</button>
       <button class="icon-btn" data-move="1" title="Bajar" ${i === state.plantilla.length - 1 ? 'disabled' : ''}>${icon('down')}</button>
@@ -485,7 +503,7 @@ $('tpl-form').addEventListener('submit', e => {
   e.preventDefault();
   const f = e.target;
   const orden = state.plantilla.reduce((m, t) => Math.max(m, t.orden ?? 0), -1) + 1;
-  save('plantilla', { nombre: f.nombre.value.trim(), cupos: clampCupos(f.cupos.value), orden })
+  save('plantilla', { nombre: f.nombre.value.trim(), icono: f.icono.value, cupos: clampCupos(f.cupos.value), orden })
     .then(() => { f.reset(); toast('Tarea base agregada'); }).catch(fallo);
 });
 
@@ -494,7 +512,7 @@ $('tpl-rows').addEventListener('change', e => {
   if (!t) return;
   const campo = e.target.dataset.field;
   const valor = campo === 'cupos' ? clampCupos(e.target.value) : e.target.value.trim();
-  if (!valor) { e.target.value = t[campo]; return; }
+  if (!valor && campo !== 'icono') { e.target.value = t[campo]; return; }
   save('plantilla', { ...t, [campo]: valor }).then(() => toast('Tarea base actualizada')).catch(fallo);
 });
 

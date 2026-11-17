@@ -1,8 +1,8 @@
 // Vista pública: solo lectura, una tarjeta a la vez (Anterior · Actual · Próxima).
-import './icons.js?v=20261117c';
-import { subscribe } from './db.js?v=20261117c';
-import { hoyISO, bannerModo } from './common.js?v=20261117c';
-import { cardHTML } from './cards.js?v=20261117c';
+import './icons.js?v=20261117d';
+import { subscribe } from './db.js?v=20261117d';
+import { hoyISO, bannerModo } from './common.js?v=20261117d';
+import { cardHTML } from './cards.js?v=20261117d';
 
 bannerModo();
 
@@ -12,6 +12,7 @@ const corto = new Intl.DateTimeFormat('es', { day: 'numeric', month: 'short' });
 
 let semanas = [];
 let rel = 0; // -1 anterior, 0 actual, 1 próxima
+let fijo = new URLSearchParams(location.search).get('s'); // enlace compartido a una semana concreta
 
 /** Índice del turno actual: el de hoy o el siguiente; si ya pasaron todos, el último. */
 function indiceActual() {
@@ -33,15 +34,24 @@ function render() {
     b.setAttribute('aria-pressed', Number(b.dataset.rel) === rel);
     b.querySelector('small').textContent = s?.fecha ? corto.format(new Date(`${s.fecha}T12:00:00`)) : '—';
   });
-  if (!semanas[base + rel]) rel = 0;
-  const s = semanas[base + rel];
+  // Enlace compartido: mostrar esa semana (si es anterior/actual/próxima, marcar el botón)
+  if (fijo) {
+    const i = semanas.findIndex(x => x.id === fijo);
+    if (i === -1) fijo = null;
+    else if (Math.abs(i - base) <= 1) { rel = i - base; fijo = null; }
+  }
+  if (!fijo && !semanas[base + rel]) rel = 0;
+  const s = fijo ? semanas.find(x => x.id === fijo) : semanas[base + rel];
+  if (fijo) $btns.forEach(b => b.setAttribute('aria-pressed', 'false'));
   const hoy = hoyISO();
-  const etiqueta = rel === -1 ? 'Turno anterior' : rel === 1 ? 'Siguiente turno' : s.fecha === hoy ? 'Hoy' : s.fecha < hoy ? 'Último turno' : 'Turno actual';
+  const etiqueta = fijo ? 'Turno compartido' : rel === -1 ? 'Turno anterior' : rel === 1 ? 'Siguiente turno' : s.fecha === hoy ? 'Hoy' : s.fecha < hoy ? 'Último turno' : 'Turno actual';
   $card.innerHTML = cardHTML(s, { estatico: true, proxima: rel === 0, pasada: s.fecha < hoy, etiqueta });
 }
 
 function ir(nuevo) {
-  if (nuevo < -1 || nuevo > 1 || !semanas[indiceActual() + nuevo] || nuevo === rel) return;
+  if (nuevo < -1 || nuevo > 1 || !semanas[indiceActual() + nuevo] || (nuevo === rel && !fijo)) return;
+  fijo = null;
+  history.replaceState(null, '', location.pathname);
   rel = nuevo;
   render();
 }
