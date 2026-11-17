@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cronograma de Limpieza - Grupo 5</title>
-    <link rel="stylesheet" href="style.css?v=12">
+    <link rel="stylesheet" href="style.css?v=32">
     <!-- FontAwesome para iconos modernos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -14,6 +14,15 @@
             <h1><i class="fa-solid fa-broom"></i> Cronograma de Limpieza</h1>
             <p class="subtitle">Grupo 5 • Organización y Turnos</p>
         </header>
+
+        <!-- Menú desplegable para seleccionar la semana directamente -->
+        <div class="filter-box">
+            <label for="week-select"><i class="fa-solid fa-filter"></i> Seleccionar Semana:</label>
+            <select id="week-select">
+                <option value="all">Todas las semanas</option>
+                <!-- Las opciones se llenan solas con JavaScript -->
+            </select>
+        </div>
 
         <div class="actions">
             <button id="add-btn" class="btn-primary"><i class="fa-solid fa-plus"></i> Nueva Semana</button>
@@ -38,7 +47,7 @@
                 </div>
                 <div class="form-group">
                     <label for="date-input">Fechas:</label>
-                    <input type="text" id="date-input" required placeholder="Ej. 16 Nov - 22 Nov">
+                    <input type="text" id="date-input" required placeholder="Ej. 19 Noviembre">
                 </div>
                 <div class="form-group">
                     <label for="captain-input">Capitán del Grupo:</label>
@@ -46,13 +55,13 @@
                 </div>
                 <div class="form-group">
                     <label for="tasks-input">Tareas (separadas por coma):</label>
-                    <input type="text" id="tasks-input" required placeholder="Baños, Auditorio principal, Plataforma">
+                    <input type="text" id="tasks-input" required placeholder="Baños, Auditorio principal">
                 </div>
                 <button type="submit" class="btn-primary btn-block">Guardar Cambios</button>
             </form>
         </div>
     </div>
 
-    <script src="script.js?v=12"></script>
+    <script src="script.js?v=32"></script>
 </body>
 </html>

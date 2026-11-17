@@ -61,29 +61,42 @@ const defaultSchedule = [
     }
 ];
 
-// Cargar desde localStorage con nueva clave para evitar caché vieja
 let scheduleData = JSON.parse(localStorage.getItem('grupo5_schedule_v2')) || defaultSchedule;
 
-// Elementos del DOM
 const scheduleContainer = document.getElementById('schedule-container');
+const weekSelect = document.getElementById('week-select');
 const modal = document.getElementById('modal');
 const addBtn = document.getElementById('add-btn');
 const resetBtn = document.getElementById('reset-btn');
 const closeModal = document.getElementById('close-modal');
 const scheduleForm = document.getElementById('schedule-form');
 
-const modalTitle = document.getElementById('modal-title');
-const itemIdInput = document.getElementById('item-id');
-const weekInput = document.getElementById('week-input');
-const dateInput = document.getElementById('date-input');
-const captainInput = document.getElementById('captain-input');
-const tasksInput = document.getElementById('tasks-input');
-
-// Renderizar tarjetas en pantalla
-function renderSchedule() {
-    scheduleContainer.innerHTML = '';
+// Rellenar las opciones del menú desplegable automáticamente
+function updateWeekSelector() {
+    if (!weekSelect) return;
+    const currentValue = weekSelect.value;
+    weekSelect.innerHTML = '<option value="all">Ver todas las semanas</option>';
     
     scheduleData.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.week;
+        option.textContent = `${item.week} (${item.dates}) - Cap: ${item.captain}`;
+        weekSelect.appendChild(option);
+    });
+    
+    weekSelect.value = currentValue;
+}
+
+function renderSchedule(lista) {
+    if (!scheduleContainer) return;
+    scheduleContainer.innerHTML = '';
+    
+    if (lista.length === 0) {
+        scheduleContainer.innerHTML = '<p class="no-results">No hay turnos disponibles.</p>';
+        return;
+    }
+
+    lista.forEach(item => {
         const card = document.createElement('div');
         card.className = 'schedule-card';
         
@@ -111,89 +124,96 @@ function renderSchedule() {
     });
 }
 
-// Guardar en la memoria local del navegador
-function saveToLocalStorage() {
-    localStorage.setItem('grupo5_schedule_v2', JSON.stringify(scheduleData));
+// Filtrar al cambiar de opción en el menú
+if (weekSelect) {
+    weekSelect.addEventListener('change', (e) => {
+        const seleccion = e.target.value;
+        if (seleccion === 'all') {
+            renderSchedule(scheduleData);
+        } else {
+            const filtrados = scheduleData.filter(item => item.week === seleccion);
+            renderSchedule(filtrados);
+        }
+    });
 }
 
-// Abrir modal para crear nuevo turno
-addBtn.addEventListener('click', () => {
-    modalTitle.textContent = 'Agregar Nuevo Turno';
-    itemIdInput.value = '';
-    weekInput.value = `Semana ${scheduleData.length + 1}`;
-    dateInput.value = '';
-    captainInput.value = '';
-    tasksInput.value = '';
-    modal.style.display = 'flex';
-});
+function saveToLocalStorage() {
+    localStorage.setItem('grupo5_schedule_v2', JSON.stringify(scheduleData));
+    updateWeekSelector();
+}
 
-// Abrir modal para editar turno existente
+if (addBtn) {
+    addBtn.addEventListener('click', () => {
+        document.getElementById('modal-title').textContent = 'Agregar Nuevo Turno';
+        document.getElementById('item-id').value = '';
+        document.getElementById('week-input').value = `Semana ${scheduleData.length + 1}`;
+        document.getElementById('date-input').value = '';
+        document.getElementById('captain-input').value = '';
+        document.getElementById('tasks-input').value = '';
+        modal.style.display = 'flex';
+    });
+}
+
 window.openEditModal = function(id) {
     const item = scheduleData.find(i => i.id === id);
     if (!item) return;
 
-    modalTitle.textContent = 'Modificar Turno';
-    itemIdInput.value = item.id;
-    weekInput.value = item.week;
-    dateInput.value = item.dates;
-    captainInput.value = item.captain;
-    tasksInput.value = item.tasks.join(', ');
+    document.getElementById('modal-title').textContent = 'Modificar Turno';
+    document.getElementById('item-id').value = item.id;
+    document.getElementById('week-input').value = item.week;
+    document.getElementById('date-input').value = item.dates;
+    document.getElementById('captain-input').value = item.captain;
+    document.getElementById('tasks-input').value = item.tasks.join(', ');
     modal.style.display = 'flex';
 };
 
-// Cerrar modal
-closeModal.addEventListener('click', () => {
-    modal.style.display = 'none';
-});
+if (closeModal) closeModal.addEventListener('click', () => modal.style.display = 'none');
+window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
 
-window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-        modal.style.display = 'none';
-    }
-});
+if (scheduleForm) {
+    scheduleForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const id = document.getElementById('item-id').value;
+        const week = document.getElementById('week-input').value;
+        const dates = document.getElementById('date-input').value;
+        const captain = document.getElementById('captain-input').value;
+        const tasks = document.getElementById('tasks-input').value.split(',').map(t => t.trim()).filter(t => t.length > 0);
 
-// Manejar envío del formulario (Crear o Actualizar)
-scheduleForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const id = itemIdInput.value;
-    const week = weekInput.value;
-    const dates = dateInput.value;
-    const captain = captainInput.value;
-    const tasks = tasksInput.value.split(',').map(t => t.trim()).filter(t => t.length > 0);
-
-    if (id) {
-        const index = scheduleData.findIndex(i => i.id == id);
-        if (index !== -1) {
-            scheduleData[index] = { id: Number(id), week, dates, captain, tasks };
+        if (id) {
+            const index = scheduleData.findIndex(i => i.id == id);
+            if (index !== -1) {
+                scheduleData[index] = { id: Number(id), week, dates, captain, tasks };
+            }
+        } else {
+            const newId = scheduleData.length > 0 ? Math.max(...scheduleData.map(i => i.id)) + 1 : 1;
+            scheduleData.push({ id: newId, week, dates, captain, tasks });
         }
-    } else {
-        const newId = scheduleData.length > 0 ? Math.max(...scheduleData.map(i => i.id)) + 1 : 1;
-        scheduleData.push({ id: newId, week, dates, captain, tasks });
-    }
 
-    saveToLocalStorage();
-    renderSchedule();
-    modal.style.display = 'none';
-});
+        saveToLocalStorage();
+        renderSchedule(scheduleData);
+        modal.style.display = 'none';
+    });
+}
 
-// Eliminar un turno
 window.deleteItem = function(id) {
     if (confirm('¿Estás seguro de eliminar este turno del cronograma?')) {
         scheduleData = scheduleData.filter(i => i.id !== id);
         saveToLocalStorage();
-        renderSchedule();
+        renderSchedule(scheduleData);
     }
 };
 
-// Botón de restaurar datos originales
-resetBtn.addEventListener('click', () => {
-    if (confirm('¿Restaurar los turnos predeterminados? Se perderán los cambios guardados.')) {
-        scheduleData = [...defaultSchedule];
-        saveToLocalStorage();
-        renderSchedule();
-    }
-});
+if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+        if (confirm('¿Restaurar los turnos predeterminados? Se perderán los cambios guardados.')) {
+            scheduleData = [...defaultSchedule];
+            saveToLocalStorage();
+            renderSchedule(scheduleData);
+        }
+    });
+}
 
-// Inicializar app
-renderSchedule();
+// Inicializar
+updateWeekSelector();
+renderSchedule(scheduleData);
