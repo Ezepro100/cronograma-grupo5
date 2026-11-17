@@ -1,7 +1,7 @@
 // Render de la tarjeta de una semana, compartido por la vista de usuario y la de admin.
-import { esc, fmtFecha, asignados, norm } from './common.js';
+import { esc, fmtFecha, asignados, norm } from './common.js?v=20261117c';
 
-import { icon } from './icons.js';
+import { icon } from './icons.js?v=20261117c';
 
 /**
  * @param {object} s semana

@@ -1,8 +1,8 @@
 // Vista de administrador: login + CRUD de semanas, voluntarios y tareas base.
-import { icon } from './icons.js';
-import { MODE, subscribe, save, saveMany, remove, seed, onAuth, login, logout, isAdmin } from './db.js';
-import { esc, norm, asignados, hoyISO, proximaId, toast, bannerModo } from './common.js';
-import { cardHTML } from './cards.js';
+import { icon } from './icons.js?v=20261117c';
+import { MODE, subscribe, save, saveMany, remove, seed, onAuth, login, logout, isAdmin } from './db.js?v=20261117c';
+import { esc, norm, asignados, hoyISO, proximaId, toast, bannerModo } from './common.js?v=20261117c';
+import { cardHTML } from './cards.js?v=20261117c';
 
 bannerModo();
 

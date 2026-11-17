@@ -58,3 +58,7 @@ admins/{email}   { rol }                     // solo se edita desde la consola
 - Caché offline de Firestore: la segunda visita abre al instante, incluso sin red.
 - Tiempo real (`onSnapshot`): los cambios del admin aparecen sin recargar.
 - Tareas con `<details>` nativo (accesible, sin JS para abrir/cerrar). Texto escapado contra XSS.
+
+## Publicar cambios (evitar ver la versión vieja)
+
+GitHub Pages y los navegadores guardan en caché los JS/CSS. Cada archivo se pide con `?v=…`; al publicar una versión nueva ejecuta `./version.sh` (o cambia ese número a mano) antes del commit. Si aun así ves lo anterior: **Ctrl + F5** en la PC o abre en modo incógnito.
